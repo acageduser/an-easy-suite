@@ -49,7 +49,6 @@ function Download-File {
     )
     Write-Host "Downloading $output..."
     try {
-        # Initial download attempt
         $response = Invoke-WebRequest -Uri $url -MaximumRedirection 0 -ErrorAction Stop -UseBasicParsing
 
         if ($response.StatusCode -eq 302) {
@@ -60,9 +59,15 @@ function Download-File {
             Invoke-WebRequest -Uri $url -OutFile $output -ErrorAction Stop
         }
 
+        # Check the file size to ensure it is not an HTML error page
+        $fileSize = (Get-Item $output).Length
+        if ($fileSize -lt 1024) {
+            throw "Downloaded file is too small to be valid. Please check the permissions and the link."
+        }
+
         Write-Host "Downloaded $output successfully."
     } catch {
-        Write-Host "Download failed for $output. Please check the download link and try again."
+        Write-Host "Download failed for $output. Error: $_"
         exit 1
     }
 }
@@ -80,7 +85,7 @@ if (-Not (Test-Path $DOWNLOAD_MODS_FILE)) {
 }
 
 # Check if the download was successful and is a valid zip file
-if ((Test-Path $DOWNLOAD_MODS_FILE) -and (Get-Item $DOWNLOAD_MODS_FILE).Length -gt 0) {
+if ((Test-Path $DOWNLOAD_MODS_FILE) -and (Get-Item $DOWNLOAD_MODS_FILE).Length -gt 1024) {
     # Extract the downloaded archive using 7-Zip to a temporary location
     Write-Host "Extracting new mods with 7-Zip..."
     $7zipPath = "C:\Program Files\7-Zip\7z.exe" # Adjust this path if 7-Zip is installed elsewhere
@@ -130,7 +135,7 @@ if (-Not (Test-Path $DOWNLOAD_SHADERPACKS_FILE)) {
 }
 
 # Check if the download was successful and is a valid zip file
-if ((Test-Path $DOWNLOAD_SHADERPACKS_FILE) -and (Get-Item $DOWNLOAD_SHADERPACKS_FILE).Length -gt 0) {
+if ((Test-Path $DOWNLOAD_SHADERPACKS_FILE) -and (Get-Item $DOWNLOAD_SHADERPACKS_FILE).Length -gt 1024) {
     # Extract the downloaded archive using 7-Zip to a temporary location
     Write-Host "Extracting new shaderpacks with 7-Zip..."
     $7zipPath = "C:\Program Files\7-Zip\7z.exe" # Adjust this path if 7-Zip is installed elsewhere
@@ -151,67 +156,3 @@ if ((Test-Path $DOWNLOAD_SHADERPACKS_FILE) -and (Get-Item $DOWNLOAD_SHADERPACKS_
 
 # Ensure resourcepacks folder exists
 if (-Not (Test-Path $RESOURCEPACKS_FOLDER)) {
-    Write-Host "Creating resourcepacks folder..."
-    New-Item -ItemType Directory -Force -Path $RESOURCEPACKS_FOLDER | Out-Null
-}
-
-# Download the resourcepacks zip from Google Drive
-if (-Not (Test-Path $DOWNLOAD_RESOURCEPACKS_FILE)) {
-    Download-File -url $GDRIVE_RESOURCEPACKS_URL -output $DOWNLOAD_RESOURCEPACKS_FILE
-}
-
-# Check if the download was successful and is a valid zip file
-if ((Test-Path $DOWNLOAD_RESOURCEPACKS_FILE) -and (Get-Item $DOWNLOAD_RESOURCEPACKS_FILE).Length -gt 0) {
-    # Extract the downloaded archive using 7-Zip to a temporary location
-    Write-Host "Extracting new resourcepacks with 7-Zip..."
-    $7zipPath = "C:\Program Files\7-Zip\7z.exe" # Adjust this path if 7-Zip is installed elsewhere
-    $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_RESOURCEPACKS_FILE`" -o`"$TEMP_EXTRACT_PATH`" -y"
-    Invoke-Expression $extractCommand
-
-    # Move files from the temporary location to the resourcepacks folder
-    Get-ChildItem "$TEMP_EXTRACT_PATH\*" -Exclude resourcepacks | Move-Item -Destination $RESOURCEPACKS_FOLDER -Force
-
-    # Clean up the downloaded archive file and temporary extract folder
-    Write-Host "Cleaning up..."
-    Remove-Item $DOWNLOAD_RESOURCEPACKS_FILE
-    Remove-Item -Recurse -Force "$TEMP_EXTRACT_PATH\resourcepacks"
-    Write-Host "Resourcepacks update complete!"
-} else {
-    Write-Host "Download failed or the file is not a valid archive. Please check the download link and try again."
-}
-
-# Download the optionsshaders.txt from Google Drive
-if (-Not (Test-Path $DOWNLOAD_OPTIONS_SHADERS_FILE)) {
-    Download-File -url $GDRIVE_OPTIONS_SHADERS_URL -output $DOWNLOAD_OPTIONS_SHADERS_FILE
-}
-
-# Check if the download was successful
-if (Test-Path $DOWNLOAD_OPTIONS_SHADERS_FILE) {
-    # Move the downloaded optionsshaders.txt to the Minecraft folder
-    Write-Host "Moving optionsshaders.txt to the Minecraft folder..."
-    Move-Item -Force -Path $DOWNLOAD_OPTIONS_SHADERS_FILE -Destination "$env:APPDATA\.minecraft\optionsshaders.txt"
-    Write-Host "Options shaders update complete!"
-} else {
-    Write-Host "Download failed. Please check the download link and try again."
-}
-
-# Download the options.txt from Google Drive
-if (-Not (Test-Path $DOWNLOAD_OPTIONS_FILE)) {
-    Download-File -url $GDRIVE_OPTIONS_URL -output $DOWNLOAD_OPTIONS_FILE
-}
-
-# Check if the download was successful
-if (Test-Path $DOWNLOAD_OPTIONS_FILE) {
-    # Move the downloaded options.txt to the Minecraft folder
-    Write-Host "Moving options.txt to the Minecraft folder..."
-    Move-Item -Force -Path $DOWNLOAD_OPTIONS_FILE -Destination "$env:APPDATA\.minecraft\options.txt"
-    Write-Host "Options update complete!"
-} else {
-    Write-Host "Download failed. Please check the download link and try again."
-}
-
-# Restore original execution policy
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy $originalExecutionPolicy -Force
-
-Write-Host "Update process complete!"
-Pause

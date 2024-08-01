@@ -122,6 +122,11 @@ if (Test-Path $DOWNLOAD_SHADERPACKS_FILE) {
     $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_SHADERPACKS_FILE`" -o`"$TEMP_EXTRACT_PATH`" -y"
     Invoke-Expression $extractCommand
 
+    # Remove any existing conflicting folders in the destination
+    if (Test-Path "$SHADERPACKS_FOLDER\shaderpacks") {
+        Remove-Item -Recurse -Force "$SHADERPACKS_FOLDER\shaderpacks"
+    }
+
     # Move files from the temporary extraction path to the shaderpacks folder
     Get-ChildItem -Path "$TEMP_EXTRACT_PATH\*" | Move-Item -Destination $SHADERPACKS_FOLDER -Force
     Remove-Item -Recurse -Force $TEMP_EXTRACT_PATH
@@ -152,6 +157,11 @@ if (Test-Path $DOWNLOAD_RESOURCEPACKS_FILE) {
     $7zipPath = "C:\Program Files\7-Zip\7z.exe" # Adjust this path if 7-Zip is installed elsewhere
     $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_RESOURCEPACKS_FILE`" -o`"$TEMP_EXTRACT_PATH`" -y"
     Invoke-Expression $extractCommand
+
+    # Remove any existing conflicting folders in the destination
+    if (Test-Path "$RESOURCEPACKS_FOLDER\resourcepacks") {
+        Remove-Item -Recurse -Force "$RESOURCEPACKS_FOLDER\resourcepacks"
+    }
 
     # Move files from the temporary extraction path to the resourcepacks folder
     Get-ChildItem -Path "$TEMP_EXTRACT_PATH\*" | Move-Item -Destination $RESOURCEPACKS_FOLDER -Force

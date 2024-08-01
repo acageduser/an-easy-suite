@@ -89,6 +89,7 @@ if (Test-Path $MODS_FOLDER) {
     Write-Log "Existing mods folder deleted."
 }
 
+
 # Download the mods zip from Google Drive using gdown if it hasn't been downloaded already
 if (-Not (Test-Path $DOWNLOAD_MODS_FILE)) {
     Write-Host "Downloading mods archive using gdown..."
@@ -110,15 +111,15 @@ if (-Not (Test-Path $DOWNLOAD_MODS_FILE)) {
 if (Test-Path $DOWNLOAD_MODS_FILE) {
     Write-Log "Download file exists."
     
-    # Extract the downloaded archive using 7-Zip
+    # Step 3: Extract the downloaded archive using 7-Zip
     Write-Host "Extracting new mods with 7-Zip..."
     Write-Log "Extracting new mods with 7-Zip..."
     $7zipPath = "C:\Program Files\7-Zip\7z.exe" # Adjust this path if 7-Zip is installed elsewhere
-    $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_MODS_FILE`" -o`"$MODS_FOLDER`" -y"
+    $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_MODS_FILE`" -o`"$EXTRACT_PATH`" -y"
     Invoke-Expression $extractCommand
     Write-Log "Extraction completed."
 
-    # Clean up the downloaded archive file
+    # Step 4: Clean up the downloaded archive file
     Write-Host "Cleaning up..."
     Write-Log "Cleaning up..."
     Remove-Item $DOWNLOAD_MODS_FILE
@@ -157,7 +158,7 @@ if (Test-Path $DOWNLOAD_CONFIG_FILE) {
     Remove-Item -Force "$CONFIG_FOLDER\forge-client.toml"
     Write-Log "Existing forge-client.toml deleted."
 
-    # Move the downloaded forge-client.toml to the config folder
+    # Step 7: Move the downloaded forge-client.toml to the config folder
     Write-Host "Moving new forge-client.toml to the config folder..."
     Write-Log "Moving new forge-client.toml to the config folder..."
     Move-Item -Force -Path $DOWNLOAD_CONFIG_FILE -Destination "$CONFIG_FOLDER\forge-client.toml"
@@ -199,7 +200,7 @@ if (-Not (Test-Path $DOWNLOAD_SHADERPACKS_FILE)) {
 if (Test-Path $DOWNLOAD_SHADERPACKS_FILE) {
     Write-Log "Download file exists."
     
-    # Extract the downloaded archive using 7-Zip
+    # Step 3: Extract the downloaded archive using 7-Zip
     Write-Host "Extracting new shaderpacks with 7-Zip..."
     Write-Log "Extracting new shaderpacks with 7-Zip..."
     $7zipPath = "C:\Program Files\7-Zip\7z.exe" # Adjust this path if 7-Zip is installed elsewhere
@@ -249,7 +250,7 @@ if (-Not (Test-Path $DOWNLOAD_RESOURCEPACKS_FILE)) {
 if (Test-Path $DOWNLOAD_RESOURCEPACKS_FILE) {
     Write-Log "Download file exists."
     
-    # Extract the downloaded archive using 7-Zip
+    # Step 3: Extract the downloaded archive using 7-Zip
     Write-Host "Extracting new resourcepacks with 7-Zip..."
     Write-Log "Extracting new resourcepacks with 7-Zip..."
     $7zipPath = "C:\Program Files\7-Zip\7z.exe" # Adjust this path if 7-Zip is installed elsewhere
@@ -257,7 +258,7 @@ if (Test-Path $DOWNLOAD_RESOURCEPACKS_FILE) {
     Invoke-Expression $extractCommand
     Write-Log "Extraction completed."
 
-    # Clean up the downloaded archive file
+    # Step 4: Clean up the downloaded archive file
     Write-Host "Cleaning up..."
     Write-Log "Cleaning up..."
     Remove-Item $DOWNLOAD_RESOURCEPACKS_FILE
@@ -307,7 +308,7 @@ if (Test-Path $DOWNLOAD_OPTIONS_SHADERS_FILE) {
 if (-Not (Test-Path $DOWNLOAD_OPTIONS_FILE)) {
     Write-Host "Downloading options.txt using gdown..."
     Write-Log "Downloading options.txt using gdown..."
- 
+
     try {
         $gdownCommand = "gdown $GDRIVE_OPTIONS_URL -O $DOWNLOAD_OPTIONS_FILE"
         Write-Log "Running command: $gdownCommand"

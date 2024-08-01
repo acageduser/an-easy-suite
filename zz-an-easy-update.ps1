@@ -44,6 +44,14 @@ $DOWNLOAD_RESOURCEPACKS_FILE = "$env:TEMP\resourcepacks.zip"
 $DOWNLOAD_OPTIONS_SHADERS_FILE = "$env:TEMP\optionsshaders.txt"
 $DOWNLOAD_OPTIONS_FILE = "$env:TEMP\options.txt"
 
+# Ensure 7-Zip is installed
+$7zipPath = "C:\Program Files\7-Zip\7z.exe"
+if (-Not (Test-Path $7zipPath)) {
+    Write-Host "7-Zip is not installed. Please install 7-Zip from: https://www.7-zip.org/"
+    Write-Log "7-Zip is not installed."
+    exit 1
+}
+
 # Ensure gdown is installed
 Write-Host "Checking if gdown is installed..."
 Write-Log "Checking if gdown is installed..."
@@ -113,13 +121,14 @@ if (Test-Path $DOWNLOAD_MODS_FILE) {
         $zip.Dispose()
         Write-Log "The downloaded file is a valid ZIP archive."
 
-        # Extract the downloaded archive
-        Write-Host "Extracting new mods..."
-        Write-Log "Extracting new mods..."
-        Expand-Archive -Path $DOWNLOAD_MODS_FILE -DestinationPath $EXTRACT_PATH -Force
+        # Step 3: Extract the downloaded archive using 7-Zip
+        Write-Host "Extracting new mods with 7-Zip..."
+        Write-Log "Extracting new mods with 7-Zip..."
+        $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_MODS_FILE`" -o`"$EXTRACT_PATH`" -y"
+        Invoke-Expression $extractCommand
         Write-Log "Extraction completed."
 
-        # Clean up the downloaded archive file
+        # Step 4: Clean up the downloaded archive file
         Write-Host "Cleaning up..."
         Write-Log "Cleaning up..."
         Remove-Item $DOWNLOAD_MODS_FILE
@@ -163,7 +172,7 @@ if (Test-Path $DOWNLOAD_CONFIG_FILE) {
     Remove-Item -Force "$CONFIG_FOLDER\forge-client.toml"
     Write-Log "Existing forge-client.toml deleted."
 
-    # Move the downloaded forge-client.toml to the config folder
+    # Step 7: Move the downloaded forge-client.toml to the config folder
     Write-Host "Moving new forge-client.toml to the config folder..."
     Write-Log "Moving new forge-client.toml to the config folder..."
     Move-Item -Force -Path $DOWNLOAD_CONFIG_FILE -Destination "$CONFIG_FOLDER\forge-client.toml"
@@ -214,9 +223,10 @@ if (Test-Path $DOWNLOAD_SHADERPACKS_FILE) {
         Write-Log "The downloaded file is a valid ZIP archive."
 
         # Extract the downloaded shaderpacks archive, overwriting existing files
-        Write-Host "Extracting shaderpacks..."
-        Write-Log "Extracting shaderpacks..."
-        Expand-Archive -Path $DOWNLOAD_SHADERPACKS_FILE -DestinationPath $SHADERPACKS_FOLDER -Force
+        Write-Host "Extracting shaderpacks with 7-Zip..."
+        Write-Log "Extracting shaderpacks with 7-Zip..."
+        $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_SHADERPACKS_FILE`" -o`"$SHADERPACKS_FOLDER`" -y"
+        Invoke-Expression $extractCommand
         Write-Log "Shaderpacks extraction completed."
 
         # Clean up the downloaded shaderpacks archive file
@@ -274,13 +284,14 @@ if (Test-Path $DOWNLOAD_RESOURCEPACKS_FILE) {
         $zip.Dispose()
         Write-Log "The downloaded file is a valid ZIP archive."
 
-        # Extract the downloaded archive
-        Write-Host "Extracting new resourcepacks..."
-        Write-Log "Extracting new resourcepacks..."
-        Expand-Archive -Path $DOWNLOAD_RESOURCEPACKS_FILE -DestinationPath $RESOURCEPACKS_FOLDER -Force
+        # Step 3: Extract the downloaded archive using 7-Zip
+        Write-Host "Extracting new resourcepacks with 7-Zip..."
+        Write-Log "Extracting new resourcepacks with 7-Zip..."
+        $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_RESOURCEPACKS_FILE`" -o`"$RESOURCEPACKS_FOLDER`" -y"
+        Invoke-Expression $extractCommand
         Write-Log "Extraction completed."
 
-        # Clean up the downloaded archive file
+        # Step 4: Clean up the downloaded archive file
         Write-Host "Cleaning up..."
         Write-Log "Cleaning up..."
         Remove-Item $DOWNLOAD_RESOURCEPACKS_FILE

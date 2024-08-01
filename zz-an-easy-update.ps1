@@ -13,10 +13,12 @@ function Write-Log {
 }
 
 # Ensure Minecraft is closed before running this script
-Write-Host "Please make sure Minecraft is closed before running this script."
-Write-Host "If Python is not installed, download it from: https://www.python.org/downloads/release/python-3120/"
-Write-Host "After installing Python, install gdown using: pip install gdown"
-Pause
+Write-Host "Before running this script:"
+Write-Host "	- Close Minecraft."
+Write-Host "	- Verify that the following are installed on your PC:"
+Write-Host "		- Python"
+Write-Host "		- PIP"
+Write-Host "		- 7-zip"
 
 # Execution policy change
 $originalExecutionPolicy = Get-ExecutionPolicy

@@ -44,6 +44,14 @@ $DOWNLOAD_RESOURCEPACKS_FILE = "$env:TEMP\resourcepacks.zip"
 $DOWNLOAD_OPTIONS_SHADERS_FILE = "$env:TEMP\optionsshaders.txt"
 $DOWNLOAD_OPTIONS_FILE = "$env:TEMP\options.txt"
 
+# Ensure 7-Zip is installed
+$7zipPath = "C:\Program Files\7-Zip\7z.exe"
+if (-Not (Test-Path $7zipPath)) {
+    Write-Host "7-Zip is not installed. Please install 7-Zip from: https://www.7-zip.org/"
+    Write-Log "7-Zip is not installed."
+    exit 1
+}
+
 # Ensure gdown is installed
 Write-Host "Checking if gdown is installed..."
 Write-Log "Checking if gdown is installed..."
@@ -84,7 +92,6 @@ if (Test-Path $MODS_FOLDER) {
     Write-Log "Existing mods folder deleted."
 }
 
-
 # Download the mods zip from Google Drive using gdown if it hasn't been downloaded already
 if (-Not (Test-Path $DOWNLOAD_MODS_FILE)) {
     Write-Host "Downloading mods archive using gdown..."
@@ -109,17 +116,16 @@ if (Test-Path $DOWNLOAD_MODS_FILE) {
     Write-Host "Verifying the downloaded archive..."
     Write-Log "Verifying the downloaded archive..."
     
-    Add-Type -AssemblyName System.IO.Compression.FileSystem
-
     try {
         $zip = [System.IO.Compression.ZipFile]::OpenRead($DOWNLOAD_MODS_FILE)
         $zip.Dispose()
         Write-Log "The downloaded file is a valid ZIP archive."
 
-        # Step 3: Extract the downloaded archive
-        Write-Host "Extracting new mods..."
-        Write-Log "Extracting new mods..."
-        Expand-Archive -Path $DOWNLOAD_MODS_FILE -DestinationPath $EXTRACT_PATH -Force
+        # Step 3: Extract the downloaded archive using 7-Zip
+        Write-Host "Extracting new mods with 7-Zip..."
+        Write-Log "Extracting new mods with 7-Zip..."
+        $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_MODS_FILE`" -o`"$EXTRACT_PATH`" -y"
+        Invoke-Expression $extractCommand
         Write-Log "Extraction completed."
 
         # Step 4: Clean up the downloaded archive file
@@ -211,22 +217,17 @@ if (Test-Path $DOWNLOAD_SHADERPACKS_FILE) {
     Write-Host "Verifying the downloaded archive..."
     Write-Log "Verifying the downloaded archive..."
     
-    Add-Type -AssemblyName System.IO.Compression.FileSystem
-
     try {
         $zip = [System.IO.Compression.ZipFile]::OpenRead($DOWNLOAD_SHADERPACKS_FILE)
         $zip.Dispose()
         Write-Log "The downloaded file is a valid ZIP archive."
 
         # Extract the downloaded shaderpacks archive, overwriting existing files
-        Write-Host "Extracting shaderpacks..."
-        Write-Log "Extracting shaderpacks..."
-        Expand-Archive -Path $DOWNLOAD_SHADERPACKS_FILE -DestinationPath $SHADERPACKS_FOLDER -Force
+        Write-Host "Extracting shaderpacks with 7-Zip..."
+        Write-Log "Extracting shaderpacks with 7-Zip..."
+        $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_SHADERPACKS_FILE`" -o`"$SHADERPACKS_FOLDER`" -y"
+        Invoke-Expression $extractCommand
         Write-Log "Shaderpacks extraction completed."
-
-        # Move the contents out of nested folders if necessary
-        Get-ChildItem -Path "$SHADERPACKS_FOLDER\shaderpacks" | Move-Item -Destination $SHADERPACKS_FOLDER -Force
-        Remove-Item -Recurse -Force "$SHADERPACKS_FOLDER\shaderpacks"
 
         # Clean up the downloaded shaderpacks archive file
         Write-Host "Cleaning up..."
@@ -277,35 +278,30 @@ if (Test-Path $DOWNLOAD_RESOURCEPACKS_FILE) {
     # Verify the downloaded file is a valid ZIP file
     Write-Host "Verifying the downloaded archive..."
     Write-Log "Verifying the downloaded archive..."
-    
-    Add-Type -AssemblyName System.IO.Compression.FileSystem
 
     try {
         $zip = [System.IO.Compression.ZipFile]::OpenRead($DOWNLOAD_RESOURCEPACKS_FILE)
         $zip.Dispose()
         Write-Log "The downloaded file is a valid ZIP archive."
 
-        # Extract the downloaded resourcepacks archive, overwriting existing files
-        Write-Host "Extracting resourcepacks..."
-        Write-Log "Extracting resourcepacks..."
-        Expand-Archive -Path $DOWNLOAD_RESOURCEPACKS_FILE -DestinationPath $RESOURCEPACKS_FOLDER -Force
-        Write-Log "Resourcepacks extraction completed."
+        # Step 3: Extract the downloaded archive using 7-Zip
+        Write-Host "Extracting new resourcepacks with 7-Zip..."
+        Write-Log "Extracting new resourcepacks with 7-Zip..."
+        $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_RESOURCEPACKS_FILE`" -o`"$RESOURCEPACKS_FOLDER`" -y"
+        Invoke-Expression $extractCommand
+        Write-Log "Extraction completed."
 
-        # Move the contents out of nested folders if necessary
-        Get-ChildItem -Path "$RESOURCEPACKS_FOLDER\resourcepacks" | Move-Item -Destination $RESOURCEPACKS_FOLDER -Force
-        Remove-Item -Recurse -Force "$RESOURCEPACKS_FOLDER\resourcepacks"
-
-        # Clean up the downloaded resourcepacks archive file
+        # Step 4: Clean up the downloaded archive file
         Write-Host "Cleaning up..."
         Write-Log "Cleaning up..."
         Remove-Item $DOWNLOAD_RESOURCEPACKS_FILE
-        Write-Log "Resourcepacks download file deleted."
+        Write-Log "Download file deleted."
 
         Write-Host "Resourcepacks update complete!"
         Write-Log "Resourcepacks update complete!"
     } catch {
-        Write-Host "The downloaded resourcepacks file is not a valid ZIP archive. Please check the download link and try again."
-        Write-Log "The downloaded resourcepacks file is not a valid ZIP archive. Exception: $_"
+        Write-Host "The downloaded file is not a valid ZIP archive. Please check the download link and try again."
+        Write-Log "The downloaded file is not a valid ZIP archive. Exception: $_"
         Remove-Item $DOWNLOAD_RESOURCEPACKS_FILE
     }
 } else {

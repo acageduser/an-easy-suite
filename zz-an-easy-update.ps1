@@ -15,26 +15,13 @@ Write-Host ""
 $originalExecutionPolicy = Get-ExecutionPolicy
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned -Force
 
-# Google Drive URLs
-$GDRIVE_MODS_URL = "https://drive.google.com/uc?export=download&id=1LrSgBpQFoLjg_jqv0Tf3dM8isbY--iGJ"
-$GDRIVE_CONFIG_URL = "https://drive.google.com/uc?export=download&id=1Q3EnPVK74Ki2UUg3ymr0WVujH5MdzEsN"
-$GDRIVE_SHADERPACKS_URL = "https://drive.google.com/uc?export=download&id=1l56fFwPqBC7JDhvq-BUJ4kns0o9u0x57"
-$GDRIVE_RESOURCEPACKS_URL = "https://drive.google.com/uc?export=download&id=105BFnFbjfXI0zWCTfTODtRPsn89bbiqm"
-$GDRIVE_OPTIONS_SHADERS_URL = "https://drive.google.com/uc?export=download&id=1yDiiBGlhjc_vdKOgZsQBTsyfMVCRzCCB"
-$GDRIVE_OPTIONS_URL = "https://drive.google.com/uc?export=download&id=1O_tv4xaZqRe3aWoGe5e9u3umqc43w9kq"
+# Google Drive URL
+$GDRIVE_URL = "https://drive.google.com/uc?export=download&id=1vWCWGPyUZrioDOvJK_sNL32O1q6nwqYN"
 
 # Paths
-$MODS_FOLDER = "$env:APPDATA\.minecraft\mods"
-$CONFIG_FOLDER = "$env:APPDATA\.minecraft\config"
-$SHADERPACKS_FOLDER = "$env:APPDATA\.minecraft\shaderpacks"
-$RESOURCEPACKS_FOLDER = "$env:APPDATA\.minecraft\resourcepacks"
+$MINECRAFT_FOLDER = "$env:APPDATA\.minecraft"
 $TEMP_EXTRACT_PATH = "$env:TEMP\minecraft_temp_extract"
-$DOWNLOAD_MODS_FILE = "$env:TEMP\mods.zip"
-$DOWNLOAD_CONFIG_FILE = "$env:TEMP\forge-client.toml"
-$DOWNLOAD_SHADERPACKS_FILE = "$env:TEMP\shaderpacks.zip"
-$DOWNLOAD_RESOURCEPACKS_FILE = "$env:TEMP\resourcepacks.zip"
-$DOWNLOAD_OPTIONS_SHADERS_FILE = "$env:TEMP\optionsshaders.txt"
-$DOWNLOAD_OPTIONS_FILE = "$env:TEMP\options.txt"
+$DOWNLOAD_FILE = "$env:TEMP\.minecraft.zip"
 $COOKIES_PATH = "$env:USERPROFILE\.cache\gdown\cookies.txt"
 
 # Ensure the temporary extract path exists
@@ -67,147 +54,55 @@ function Download-File {
     }
 }
 
-# Delete the local mods folder before downloading
-if (Test-Path $MODS_FOLDER) {
+# Delete the local mods, shaderpacks, and resourcepacks folders before extracting the new ones
+if (Test-Path "$MINECRAFT_FOLDER\mods") {
     Write-Host "Deleting existing mods folder..."
-    Remove-Item -Recurse -Force $MODS_FOLDER
-    New-Item -ItemType Directory -Force -Path $MODS_FOLDER | Out-Null
+    Remove-Item -Recurse -Force "$MINECRAFT_FOLDER\mods"
 }
 
-# Download the mods zip from Google Drive
-if (-Not (Test-Path $DOWNLOAD_MODS_FILE)) {
-    Download-File -url $GDRIVE_MODS_URL -output $DOWNLOAD_MODS_FILE
+if (Test-Path "$MINECRAFT_FOLDER\shaderpacks") {
+    Write-Host "Deleting existing shaderpacks folder..."
+    Remove-Item -Recurse -Force "$MINECRAFT_FOLDER\shaderpacks"
 }
 
-# Check if the download was successful and is a valid zip file
-if ((Test-Path $DOWNLOAD_MODS_FILE) -and (Get-Item $DOWNLOAD_MODS_FILE).Length -gt 1024) {
-    # Extract the downloaded archive using 7-Zip to a temporary location
-    Write-Host "Extracting new mods with 7-Zip..."
-    $7zipPath = "C:\Program Files\7-Zip\7z.exe" # Adjust this path if 7-Zip is installed elsewhere
-    $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_MODS_FILE`" -o`"$TEMP_EXTRACT_PATH`" -y"
-    Invoke-Expression $extractCommand
-
-    # Move files from the temporary location to the mods folder
-    Get-ChildItem "$TEMP_EXTRACT_PATH\*" -Exclude mods | Move-Item -Destination $MODS_FOLDER -Force
-
-    # Clean up the downloaded archive file and temporary extract folder
-    Write-Host "Cleaning up..."
-    Remove-Item $DOWNLOAD_MODS_FILE
-    Remove-Item -Recurse -Force "$TEMP_EXTRACT_PATH\mods"
-    Write-Host "Mods update complete!"
-} else {
-    Write-Host "Download failed or the file is not a valid archive. Please check the download link and try again."
+if (Test-Path "$MINECRAFT_FOLDER\resourcepacks") {
+    Write-Host "Deleting existing resourcepacks folder..."
+    Remove-Item -Recurse -Force "$MINECRAFT_FOLDER\resourcepacks"
 }
 
-# Download the forge-client.toml from Google Drive
-if (-Not (Test-Path $DOWNLOAD_CONFIG_FILE)) {
-    Download-File -url $GDRIVE_CONFIG_URL -output $DOWNLOAD_CONFIG_FILE
-}
-
-# Check if the download was successful
-if (Test-Path $DOWNLOAD_CONFIG_FILE) {
-    # Verify and move the downloaded file
-    Write-Host "Deleting existing forge-client.toml..."
-    Remove-Item -Force "$CONFIG_FOLDER\forge-client.toml"
-
-    # Move the downloaded forge-client.toml to the config folder
-    Write-Host "Moving new forge-client.toml to the config folder..."
-    Move-Item -Force -Path $DOWNLOAD_CONFIG_FILE -Destination "$CONFIG_FOLDER\forge-client.toml"
-    Write-Host "Config update complete!"
-} else {
-    Write-Host "Download failed. Please check the download link and try again."
-}
-
-# Ensure shaderpacks folder exists
-if (-Not (Test-Path $SHADERPACKS_FOLDER)) {
-    Write-Host "Creating shaderpacks folder..."
-    New-Item -ItemType Directory -Force -Path $SHADERPACKS_FOLDER | Out-Null
-}
-
-# Download the shaderpacks zip from Google Drive
-if (-Not (Test-Path $DOWNLOAD_SHADERPACKS_FILE)) {
-    Download-File -url $GDRIVE_SHADERPACKS_URL -output $DOWNLOAD_SHADERPACKS_FILE
+# Download the .minecraft zip from Google Drive
+if (-Not (Test-Path $DOWNLOAD_FILE)) {
+    Download-File -url $GDRIVE_URL -output $DOWNLOAD_FILE
 }
 
 # Check if the download was successful and is a valid zip file
-if ((Test-Path $DOWNLOAD_SHADERPACKS_FILE) -and (Get-Item $DOWNLOAD_SHADERPACKS_FILE).Length -gt 1024) {
+if ((Test-Path $DOWNLOAD_FILE) -and (Get-Item $DOWNLOAD_FILE).Length -gt 1024) {
     # Extract the downloaded archive using 7-Zip to a temporary location
-    Write-Host "Extracting new shaderpacks with 7-Zip..."
+    Write-Host "Extracting .minecraft with 7-Zip..."
     $7zipPath = "C:\Program Files\7-Zip\7z.exe" # Adjust this path if 7-Zip is installed elsewhere
-    $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_SHADERPACKS_FILE`" -o`"$TEMP_EXTRACT_PATH`" -y"
+    $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_FILE`" -o`"$TEMP_EXTRACT_PATH`" -y"
     Invoke-Expression $extractCommand
 
-    # Move files from the temporary location to the shaderpacks folder
-    Get-ChildItem "$TEMP_EXTRACT_PATH\*" -Exclude shaderpacks | Move-Item -Destination $SHADERPACKS_FOLDER -Force
+    # Move folders to the .minecraft folder
+    Get-ChildItem "$TEMP_EXTRACT_PATH\.minecraft\*" | ForEach-Object {
+        $dest = "$MINECRAFT_FOLDER\$($_.Name)"
+        if ($_.PSIsContainer) {
+            if (Test-Path $dest) {
+                Remove-Item -Recurse -Force $dest
+            }
+            Move-Item -Force -Path $_.FullName -Destination $dest
+        } else {
+            Move-Item -Force -Path $_.FullName -Destination $dest
+        }
+    }
 
     # Clean up the downloaded archive file and temporary extract folder
     Write-Host "Cleaning up..."
-    Remove-Item $DOWNLOAD_SHADERPACKS_FILE
-    Remove-Item -Recurse -Force "$TEMP_EXTRACT_PATH\shaderpacks"
-    Write-Host "Shaderpacks update complete!"
+    Remove-Item $DOWNLOAD_FILE
+    Remove-Item -Recurse -Force $TEMP_EXTRACT_PATH
+    Write-Host "Update complete!"
 } else {
     Write-Host "Download failed or the file is not a valid archive. Please check the download link and try again."
-}
-
-# Ensure resourcepacks folder exists
-if (-Not (Test-Path $RESOURCEPACKS_FOLDER)) {
-    Write-Host "Creating resourcepacks folder..."
-    New-Item -ItemType Directory -Force -Path $RESOURCEPACKS_FOLDER | Out-Null
-}
-
-# Download the resourcepacks zip from Google Drive
-if (-Not (Test-Path $DOWNLOAD_RESOURCEPACKS_FILE)) {
-    Download-File -url $GDRIVE_RESOURCEPACKS_URL -output $DOWNLOAD_RESOURCEPACKS_FILE
-}
-
-# Check if the download was successful and is a valid zip file
-if ((Test-Path $DOWNLOAD_RESOURCEPACKS_FILE) -and (Get-Item $DOWNLOAD_RESOURCEPACKS_FILE).Length -gt 1024) {
-    # Extract the downloaded archive using 7-Zip to a temporary location
-    Write-Host "Extracting new resourcepacks with 7-Zip..."
-    $7zipPath = "C:\Program Files\7-Zip\7z.exe" # Adjust this path if 7-Zip is installed elsewhere
-    $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_RESOURCEPACKS_FILE`" -o`"$TEMP_EXTRACT_PATH`" -y"
-    Invoke-Expression $extractCommand
-
-    # Move files from the temporary location to the resourcepacks folder
-    Get-ChildItem "$TEMP_EXTRACT_PATH\*" -Exclude resourcepacks | Move-Item -Destination $RESOURCEPACKS_FOLDER -Force
-
-    # Clean up the downloaded archive file and temporary extract folder
-    Write-Host "Cleaning up..."
-    Remove-Item $DOWNLOAD_RESOURCEPACKS_FILE
-    Remove-Item -Recurse -Force "$TEMP_EXTRACT_PATH\resourcepacks"
-    Write-Host "Resourcepacks update complete!"
-} else {
-    Write-Host "Download failed or the file is not a valid archive. Please check the download link and try again."
-}
-
-# Download the optionsshaders.txt from Google Drive
-if (-Not (Test-Path $DOWNLOAD_OPTIONS_SHADERS_FILE)) {
-    Download-File -url $GDRIVE_OPTIONS_SHADERS_URL -output $DOWNLOAD_OPTIONS_SHADERS_FILE
-}
-
-# Check if the download was successful
-if (Test-Path $DOWNLOAD_OPTIONS_SHADERS_FILE) {
-    # Move the downloaded optionsshaders.txt to the Minecraft folder
-    Write-Host "Moving optionsshaders.txt to the Minecraft folder..."
-    Move-Item -Force -Path $DOWNLOAD_OPTIONS_SHADERS_FILE -Destination "$env:APPDATA\.minecraft\optionsshaders.txt"
-    Write-Host "Options shaders update complete!"
-} else {
-    Write-Host "Download failed. Please check the download link and try again."
-}
-
-# Download the options.txt from Google Drive
-if (-Not (Test-Path $DOWNLOAD_OPTIONS_FILE)) {
-    Download-File -url $GDRIVE_OPTIONS_URL -output $DOWNLOAD_OPTIONS_FILE
-}
-
-# Check if the download was successful
-if (Test-Path $DOWNLOAD_OPTIONS_FILE) {
-    # Move the downloaded options.txt to the Minecraft folder
-    Write-Host "Moving options.txt to the Minecraft folder..."
-    Move-Item -Force -Path $DOWNLOAD_OPTIONS_FILE -Destination "$env:APPDATA\.minecraft\options.txt"
-    Write-Host "Options update complete!"
-} else {
-    Write-Host "Download failed. Please check the download link and try again."
 }
 
 Write-Host "Update process complete!"

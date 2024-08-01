@@ -41,7 +41,7 @@ if (-Not (Test-Path $TEMP_EXTRACT_PATH)) {
     New-Item -ItemType Directory -Force -Path $TEMP_EXTRACT_PATH | Out-Null
 }
 
-# Function to download files using Invoke-WebRequest
+# Function to download files using Invoke-WebRequest with Google Drive support
 function Download-File {
     param (
         [string]$url,
@@ -49,7 +49,17 @@ function Download-File {
     )
     Write-Host "Downloading $output..."
     try {
-        Invoke-WebRequest -Uri $url -OutFile $output
+        # Initial download attempt
+        $response = Invoke-WebRequest -Uri $url -MaximumRedirection 0 -ErrorAction Stop -UseBasicParsing
+
+        if ($response.StatusCode -eq 302) {
+            $redirectUrl = $response.Headers.Location
+            Write-Host "Redirecting to $redirectUrl"
+            Invoke-WebRequest -Uri $redirectUrl -OutFile $output -ErrorAction Stop
+        } else {
+            Invoke-WebRequest -Uri $url -OutFile $output -ErrorAction Stop
+        }
+
         Write-Host "Downloaded $output successfully."
     } catch {
         Write-Host "Download failed for $output. Please check the download link and try again."
@@ -69,8 +79,8 @@ if (-Not (Test-Path $DOWNLOAD_MODS_FILE)) {
     Download-File -url $GDRIVE_MODS_URL -output $DOWNLOAD_MODS_FILE
 }
 
-# Check if the download was successful
-if (Test-Path $DOWNLOAD_MODS_FILE) {
+# Check if the download was successful and is a valid zip file
+if ((Test-Path $DOWNLOAD_MODS_FILE) -and (Get-Item $DOWNLOAD_MODS_FILE).Length -gt 0) {
     # Extract the downloaded archive using 7-Zip to a temporary location
     Write-Host "Extracting new mods with 7-Zip..."
     $7zipPath = "C:\Program Files\7-Zip\7z.exe" # Adjust this path if 7-Zip is installed elsewhere
@@ -86,7 +96,7 @@ if (Test-Path $DOWNLOAD_MODS_FILE) {
     Remove-Item -Recurse -Force "$TEMP_EXTRACT_PATH\mods"
     Write-Host "Mods update complete!"
 } else {
-    Write-Host "Download failed. Please check the download link and try again."
+    Write-Host "Download failed or the file is not a valid archive. Please check the download link and try again."
 }
 
 # Download the forge-client.toml from Google Drive
@@ -119,8 +129,8 @@ if (-Not (Test-Path $DOWNLOAD_SHADERPACKS_FILE)) {
     Download-File -url $GDRIVE_SHADERPACKS_URL -output $DOWNLOAD_SHADERPACKS_FILE
 }
 
-# Check if the download was successful
-if (Test-Path $DOWNLOAD_SHADERPACKS_FILE) {
+# Check if the download was successful and is a valid zip file
+if ((Test-Path $DOWNLOAD_SHADERPACKS_FILE) -and (Get-Item $DOWNLOAD_SHADERPACKS_FILE).Length -gt 0) {
     # Extract the downloaded archive using 7-Zip to a temporary location
     Write-Host "Extracting new shaderpacks with 7-Zip..."
     $7zipPath = "C:\Program Files\7-Zip\7z.exe" # Adjust this path if 7-Zip is installed elsewhere
@@ -136,7 +146,7 @@ if (Test-Path $DOWNLOAD_SHADERPACKS_FILE) {
     Remove-Item -Recurse -Force "$TEMP_EXTRACT_PATH\shaderpacks"
     Write-Host "Shaderpacks update complete!"
 } else {
-    Write-Host "Download failed. Please check the download link and try again."
+    Write-Host "Download failed or the file is not a valid archive. Please check the download link and try again."
 }
 
 # Ensure resourcepacks folder exists
@@ -150,8 +160,8 @@ if (-Not (Test-Path $DOWNLOAD_RESOURCEPACKS_FILE)) {
     Download-File -url $GDRIVE_RESOURCEPACKS_URL -output $DOWNLOAD_RESOURCEPACKS_FILE
 }
 
-# Check if the download was successful
-if (Test-Path $DOWNLOAD_RESOURCEPACKS_FILE) {
+# Check if the download was successful and is a valid zip file
+if ((Test-Path $DOWNLOAD_RESOURCEPACKS_FILE) -and (Get-Item $DOWNLOAD_RESOURCEPACKS_FILE).Length -gt 0) {
     # Extract the downloaded archive using 7-Zip to a temporary location
     Write-Host "Extracting new resourcepacks with 7-Zip..."
     $7zipPath = "C:\Program Files\7-Zip\7z.exe" # Adjust this path if 7-Zip is installed elsewhere
@@ -167,7 +177,7 @@ if (Test-Path $DOWNLOAD_RESOURCEPACKS_FILE) {
     Remove-Item -Recurse -Force "$TEMP_EXTRACT_PATH\resourcepacks"
     Write-Host "Resourcepacks update complete!"
 } else {
-    Write-Host "Download failed. Please check the download link and try again."
+    Write-Host "Download failed or the file is not a valid archive. Please check the download link and try again."
 }
 
 # Download the optionsshaders.txt from Google Drive

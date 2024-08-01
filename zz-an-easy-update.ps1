@@ -41,7 +41,7 @@ if (-Not (Test-Path $TEMP_EXTRACT_PATH)) {
     New-Item -ItemType Directory -Force -Path $TEMP_EXTRACT_PATH | Out-Null
 }
 
-# Function to download files
+# Function to download files using gdown
 function Download-File {
     param (
         [string]$url,
@@ -49,7 +49,7 @@ function Download-File {
     )
     Write-Host "Downloading $output..."
     try {
-        Invoke-WebRequest -Uri $url -OutFile $output
+        & "python" -c "import gdown; gdown.download('$url', r'$output', quiet=False)"
         Write-Host "Downloaded $output successfully."
     } catch {
         Write-Host "Download failed for $output. Please check the download link and try again."
@@ -63,7 +63,7 @@ if (Test-Path $MODS_FOLDER) {
     Remove-Item -Recurse -Force $MODS_FOLDER
 }
 
-# Download the mods zip from Google Drive using Invoke-WebRequest
+# Download the mods zip from Google Drive using gdown
 if (-Not (Test-Path $DOWNLOAD_MODS_FILE)) {
     Download-File -url $GDRIVE_MODS_URL -output $DOWNLOAD_MODS_FILE
 }
@@ -84,7 +84,7 @@ if (Test-Path $DOWNLOAD_MODS_FILE) {
     Write-Host "Download failed. Please check the download link and try again."
 }
 
-# Download the forge-client.toml from Google Drive using Invoke-WebRequest
+# Download the forge-client.toml from Google Drive using gdown
 if (-Not (Test-Path $DOWNLOAD_CONFIG_FILE)) {
     Download-File -url $GDRIVE_CONFIG_URL -output $DOWNLOAD_CONFIG_FILE
 }
@@ -109,7 +109,7 @@ if (-Not (Test-Path $SHADERPACKS_FOLDER)) {
     New-Item -ItemType Directory -Force -Path $SHADERPACKS_FOLDER
 }
 
-# Download the shaderpacks zip from Google Drive using Invoke-WebRequest
+# Download the shaderpacks zip from Google Drive using gdown
 if (-Not (Test-Path $DOWNLOAD_SHADERPACKS_FILE)) {
     Download-File -url $GDRIVE_SHADERPACKS_URL -output $DOWNLOAD_SHADERPACKS_FILE
 }
@@ -140,7 +140,7 @@ if (-Not (Test-Path $RESOURCEPACKS_FOLDER)) {
     New-Item -ItemType Directory -Force -Path $RESOURCEPACKS_FOLDER
 }
 
-# Download the resourcepacks zip from Google Drive using Invoke-WebRequest
+# Download the resourcepacks zip from Google Drive using gdown
 if (-Not (Test-Path $DOWNLOAD_RESOURCEPACKS_FILE)) {
     Download-File -url $GDRIVE_RESOURCEPACKS_URL -output $DOWNLOAD_RESOURCEPACKS_FILE
 }
@@ -165,7 +165,7 @@ if (Test-Path $DOWNLOAD_RESOURCEPACKS_FILE) {
     Write-Host "Download failed. Please check the download link and try again."
 }
 
-# Download the optionsshaders.txt from Google Drive using Invoke-WebRequest
+# Download the optionsshaders.txt from Google Drive using gdown
 if (-Not (Test-Path $DOWNLOAD_OPTIONS_SHADERS_FILE)) {
     Download-File -url $GDRIVE_OPTIONS_SHADERS_URL -output $DOWNLOAD_OPTIONS_SHADERS_FILE
 }
@@ -180,7 +180,7 @@ if (Test-Path $DOWNLOAD_OPTIONS_SHADERS_FILE) {
     Write-Host "Download failed. Please check the download link and try again."
 }
 
-# Download the options.txt from Google Drive using Invoke-WebRequest
+# Download the options.txt from Google Drive using gdown
 if (-Not (Test-Path $DOWNLOAD_OPTIONS_FILE)) {
     Download-File -url $GDRIVE_OPTIONS_URL -output $DOWNLOAD_OPTIONS_FILE
 }

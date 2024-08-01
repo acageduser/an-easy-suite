@@ -78,7 +78,7 @@ if (Test-Path $DOWNLOAD_MODS_FILE) {
     Invoke-Expression $extractCommand
 
     # Move files from the temporary location to the mods folder
-    Get-ChildItem "$TEMP_EXTRACT_PATH\mods\*" | Move-Item -Destination $MODS_FOLDER -Force
+    Get-ChildItem "$TEMP_EXTRACT_PATH\*" -Exclude mods | Move-Item -Destination $MODS_FOLDER -Force
 
     # Clean up the downloaded archive file and temporary extract folder
     Write-Host "Cleaning up..."
@@ -128,7 +128,7 @@ if (Test-Path $DOWNLOAD_SHADERPACKS_FILE) {
     Invoke-Expression $extractCommand
 
     # Move files from the temporary location to the shaderpacks folder
-    Get-ChildItem "$TEMP_EXTRACT_PATH\shaderpacks\*" | Move-Item -Destination $SHADERPACKS_FOLDER -Force
+    Get-ChildItem "$TEMP_EXTRACT_PATH\*" -Exclude shaderpacks | Move-Item -Destination $SHADERPACKS_FOLDER -Force
 
     # Clean up the downloaded archive file and temporary extract folder
     Write-Host "Cleaning up..."
@@ -159,7 +159,7 @@ if (Test-Path $DOWNLOAD_RESOURCEPACKS_FILE) {
     Invoke-Expression $extractCommand
 
     # Move files from the temporary location to the resourcepacks folder
-    Get-ChildItem "$TEMP_EXTRACT_PATH\resourcepacks\*" | Move-Item -Destination $RESOURCEPACKS_FOLDER -Force
+    Get-ChildItem "$TEMP_EXTRACT_PATH\*" -Exclude resourcepacks | Move-Item -Destination $RESOURCEPACKS_FOLDER -Force
 
     # Clean up the downloaded archive file and temporary extract folder
     Write-Host "Cleaning up..."

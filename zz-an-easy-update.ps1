@@ -41,7 +41,7 @@ if (-Not (Test-Path $TEMP_EXTRACT_PATH)) {
     New-Item -ItemType Directory -Force -Path $TEMP_EXTRACT_PATH | Out-Null
 }
 
-# Function to download files using gdown
+# Function to download files using Invoke-WebRequest
 function Download-File {
     param (
         [string]$url,
@@ -49,7 +49,7 @@ function Download-File {
     )
     Write-Host "Downloading $output..."
     try {
-        & "python" -c "import gdown; gdown.download('$url', r'$output', quiet=False)"
+        Invoke-WebRequest -Uri $url -OutFile $output
         Write-Host "Downloaded $output successfully."
     } catch {
         Write-Host "Download failed for $output. Please check the download link and try again."
@@ -64,7 +64,7 @@ if (Test-Path $MODS_FOLDER) {
     New-Item -ItemType Directory -Force -Path $MODS_FOLDER | Out-Null
 }
 
-# Download the mods zip from Google Drive using gdown
+# Download the mods zip from Google Drive
 if (-Not (Test-Path $DOWNLOAD_MODS_FILE)) {
     Download-File -url $GDRIVE_MODS_URL -output $DOWNLOAD_MODS_FILE
 }
@@ -78,18 +78,18 @@ if (Test-Path $DOWNLOAD_MODS_FILE) {
     Invoke-Expression $extractCommand
 
     # Move files from the temporary location to the mods folder
-    Get-ChildItem "$TEMP_EXTRACT_PATH\*" | Move-Item -Destination $MODS_FOLDER -Force
+    Get-ChildItem "$TEMP_EXTRACT_PATH\mods\*" | Move-Item -Destination $MODS_FOLDER -Force
 
     # Clean up the downloaded archive file and temporary extract folder
     Write-Host "Cleaning up..."
     Remove-Item $DOWNLOAD_MODS_FILE
-    Remove-Item -Recurse -Force $TEMP_EXTRACT_PATH
+    Remove-Item -Recurse -Force "$TEMP_EXTRACT_PATH\mods"
     Write-Host "Mods update complete!"
 } else {
     Write-Host "Download failed. Please check the download link and try again."
 }
 
-# Download the forge-client.toml from Google Drive using gdown
+# Download the forge-client.toml from Google Drive
 if (-Not (Test-Path $DOWNLOAD_CONFIG_FILE)) {
     Download-File -url $GDRIVE_CONFIG_URL -output $DOWNLOAD_CONFIG_FILE
 }
@@ -114,7 +114,7 @@ if (-Not (Test-Path $SHADERPACKS_FOLDER)) {
     New-Item -ItemType Directory -Force -Path $SHADERPACKS_FOLDER | Out-Null
 }
 
-# Download the shaderpacks zip from Google Drive using gdown
+# Download the shaderpacks zip from Google Drive
 if (-Not (Test-Path $DOWNLOAD_SHADERPACKS_FILE)) {
     Download-File -url $GDRIVE_SHADERPACKS_URL -output $DOWNLOAD_SHADERPACKS_FILE
 }
@@ -128,12 +128,12 @@ if (Test-Path $DOWNLOAD_SHADERPACKS_FILE) {
     Invoke-Expression $extractCommand
 
     # Move files from the temporary location to the shaderpacks folder
-    Get-ChildItem "$TEMP_EXTRACT_PATH\*" | Move-Item -Destination $SHADERPACKS_FOLDER -Force
+    Get-ChildItem "$TEMP_EXTRACT_PATH\shaderpacks\*" | Move-Item -Destination $SHADERPACKS_FOLDER -Force
 
     # Clean up the downloaded archive file and temporary extract folder
     Write-Host "Cleaning up..."
     Remove-Item $DOWNLOAD_SHADERPACKS_FILE
-    Remove-Item -Recurse -Force $TEMP_EXTRACT_PATH
+    Remove-Item -Recurse -Force "$TEMP_EXTRACT_PATH\shaderpacks"
     Write-Host "Shaderpacks update complete!"
 } else {
     Write-Host "Download failed. Please check the download link and try again."
@@ -145,7 +145,7 @@ if (-Not (Test-Path $RESOURCEPACKS_FOLDER)) {
     New-Item -ItemType Directory -Force -Path $RESOURCEPACKS_FOLDER | Out-Null
 }
 
-# Download the resourcepacks zip from Google Drive using gdown
+# Download the resourcepacks zip from Google Drive
 if (-Not (Test-Path $DOWNLOAD_RESOURCEPACKS_FILE)) {
     Download-File -url $GDRIVE_RESOURCEPACKS_URL -output $DOWNLOAD_RESOURCEPACKS_FILE
 }
@@ -159,18 +159,18 @@ if (Test-Path $DOWNLOAD_RESOURCEPACKS_FILE) {
     Invoke-Expression $extractCommand
 
     # Move files from the temporary location to the resourcepacks folder
-    Get-ChildItem "$TEMP_EXTRACT_PATH\*" | Move-Item -Destination $RESOURCEPACKS_FOLDER -Force
+    Get-ChildItem "$TEMP_EXTRACT_PATH\resourcepacks\*" | Move-Item -Destination $RESOURCEPACKS_FOLDER -Force
 
     # Clean up the downloaded archive file and temporary extract folder
     Write-Host "Cleaning up..."
     Remove-Item $DOWNLOAD_RESOURCEPACKS_FILE
-    Remove-Item -Recurse -Force $TEMP_EXTRACT_PATH
+    Remove-Item -Recurse -Force "$TEMP_EXTRACT_PATH\resourcepacks"
     Write-Host "Resourcepacks update complete!"
 } else {
     Write-Host "Download failed. Please check the download link and try again."
 }
 
-# Download the optionsshaders.txt from Google Drive using gdown
+# Download the optionsshaders.txt from Google Drive
 if (-Not (Test-Path $DOWNLOAD_OPTIONS_SHADERS_FILE)) {
     Download-File -url $GDRIVE_OPTIONS_SHADERS_URL -output $DOWNLOAD_OPTIONS_SHADERS_FILE
 }
@@ -185,7 +185,7 @@ if (Test-Path $DOWNLOAD_OPTIONS_SHADERS_FILE) {
     Write-Host "Download failed. Please check the download link and try again."
 }
 
-# Download the options.txt from Google Drive using gdown
+# Download the options.txt from Google Drive
 if (-Not (Test-Path $DOWNLOAD_OPTIONS_FILE)) {
     Download-File -url $GDRIVE_OPTIONS_URL -output $DOWNLOAD_OPTIONS_FILE
 }

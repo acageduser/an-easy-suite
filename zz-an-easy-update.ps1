@@ -41,7 +41,7 @@ $MODS_FOLDER = "$env:APPDATA\.minecraft\mods"
 $CONFIG_FOLDER = "$env:APPDATA\.minecraft\config"
 $SHADERPACKS_FOLDER = "$env:APPDATA\.minecraft\shaderpacks"
 $RESOURCEPACKS_FOLDER = "$env:APPDATA\.minecraft\resourcepacks"
-$EXTRACT_PATH = "$env:APPDATA\.minecraft"
+$TEMP_EXTRACT_PATH = "$env:TEMP\minecraft_temp_extract"
 $DOWNLOAD_MODS_FILE = "$env:TEMP\mods.zip"
 $DOWNLOAD_CONFIG_FILE = "$env:TEMP\forge-client.toml"
 $DOWNLOAD_SHADERPACKS_FILE = "$env:TEMP\shaderpacks.zip"
@@ -199,13 +199,17 @@ if (-Not (Test-Path $DOWNLOAD_SHADERPACKS_FILE)) {
 if (Test-Path $DOWNLOAD_SHADERPACKS_FILE) {
     Write-Log "Download file exists."
     
-    # Extract the downloaded archive using 7-Zip
+    # Extract the downloaded archive using 7-Zip to a temporary location
     Write-Host "Extracting new shaderpacks with 7-Zip..."
     Write-Log "Extracting new shaderpacks with 7-Zip..."
     $7zipPath = "C:\Program Files\7-Zip\7z.exe" # Adjust this path if 7-Zip is installed elsewhere
-    $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_SHADERPACKS_FILE`" -o`"$SHADERPACKS_FOLDER`" -y"
+    $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_SHADERPACKS_FILE`" -o`"$TEMP_EXTRACT_PATH`" -y"
     Invoke-Expression $extractCommand
     Write-Log "Extraction completed."
+
+    # Move files from the temporary extraction path to the shaderpacks folder
+    Get-ChildItem -Path "$TEMP_EXTRACT_PATH\*" | Move-Item -Destination $SHADERPACKS_FOLDER -Force
+    Remove-Item -Recurse -Force $TEMP_EXTRACT_PATH
 
     # Clean up the downloaded shaderpacks archive file
     Write-Host "Cleaning up..."
@@ -249,15 +253,19 @@ if (-Not (Test-Path $DOWNLOAD_RESOURCEPACKS_FILE)) {
 if (Test-Path $DOWNLOAD_RESOURCEPACKS_FILE) {
     Write-Log "Download file exists."
     
-    # Extract the downloaded archive using 7-Zip
+    # Extract the downloaded archive using 7-Zip to a temporary location
     Write-Host "Extracting new resourcepacks with 7-Zip..."
     Write-Log "Extracting new resourcepacks with 7-Zip..."
     $7zipPath = "C:\Program Files\7-Zip\7z.exe" # Adjust this path if 7-Zip is installed elsewhere
-    $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_RESOURCEPACKS_FILE`" -o`"$RESOURCEPACKS_FOLDER`" -y"
+    $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_RESOURCEPACKS_FILE`" -o`"$TEMP_EXTRACT_PATH`" -y"
     Invoke-Expression $extractCommand
     Write-Log "Extraction completed."
 
-    # Clean up the downloaded archive file
+    # Move files from the temporary extraction path to the resourcepacks folder
+    Get-ChildItem -Path "$TEMP_EXTRACT_PATH\*" | Move-Item -Destination $RESOURCEPACKS_FOLDER -Force
+    Remove-Item -Recurse -Force $TEMP_EXTRACT_PATH
+
+    # Clean up the downloaded resourcepacks archive file
     Write-Host "Cleaning up..."
     Write-Log "Cleaning up..."
     Remove-Item $DOWNLOAD_RESOURCEPACKS_FILE

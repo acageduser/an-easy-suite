@@ -61,6 +61,7 @@ function Download-File {
 if (Test-Path $MODS_FOLDER) {
     Write-Host "Deleting existing mods folder..."
     Remove-Item -Recurse -Force $MODS_FOLDER
+    New-Item -ItemType Directory -Force -Path $MODS_FOLDER | Out-Null
 }
 
 # Download the mods zip from Google Drive using gdown
@@ -70,15 +71,19 @@ if (-Not (Test-Path $DOWNLOAD_MODS_FILE)) {
 
 # Check if the download was successful
 if (Test-Path $DOWNLOAD_MODS_FILE) {
-    # Extract the downloaded archive using 7-Zip
+    # Extract the downloaded archive using 7-Zip to a temporary location
     Write-Host "Extracting new mods with 7-Zip..."
     $7zipPath = "C:\Program Files\7-Zip\7z.exe" # Adjust this path if 7-Zip is installed elsewhere
-    $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_MODS_FILE`" -o`"$MODS_FOLDER`" -y"
+    $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_MODS_FILE`" -o`"$TEMP_EXTRACT_PATH`" -y"
     Invoke-Expression $extractCommand
 
-    # Clean up the downloaded archive file
+    # Move files from the temporary location to the mods folder
+    Get-ChildItem "$TEMP_EXTRACT_PATH\*" -Recurse | Move-Item -Destination $MODS_FOLDER -Force
+
+    # Clean up the downloaded archive file and temporary extract folder
     Write-Host "Cleaning up..."
     Remove-Item $DOWNLOAD_MODS_FILE
+    Remove-Item -Recurse -Force $TEMP_EXTRACT_PATH
     Write-Host "Mods update complete!"
 } else {
     Write-Host "Download failed. Please check the download link and try again."
@@ -106,7 +111,7 @@ if (Test-Path $DOWNLOAD_CONFIG_FILE) {
 # Ensure shaderpacks folder exists
 if (-Not (Test-Path $SHADERPACKS_FOLDER)) {
     Write-Host "Creating shaderpacks folder..."
-    New-Item -ItemType Directory -Force -Path $SHADERPACKS_FOLDER
+    New-Item -ItemType Directory -Force -Path $SHADERPACKS_FOLDER | Out-Null
 }
 
 # Download the shaderpacks zip from Google Drive using gdown
@@ -122,18 +127,13 @@ if (Test-Path $DOWNLOAD_SHADERPACKS_FILE) {
     $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_SHADERPACKS_FILE`" -o`"$TEMP_EXTRACT_PATH`" -y"
     Invoke-Expression $extractCommand
 
-    # Remove any existing conflicting folders in the destination
-    if (Test-Path "$SHADERPACKS_FOLDER\shaderpacks") {
-        Remove-Item -Recurse -Force "$SHADERPACKS_FOLDER\shaderpacks"
-    }
+    # Move files from the temporary location to the shaderpacks folder
+    Get-ChildItem "$TEMP_EXTRACT_PATH\*" -Recurse | Move-Item -Destination $SHADERPACKS_FOLDER -Force
 
-    # Move files from the temporary extraction path to the shaderpacks folder
-    Get-ChildItem -Path "$TEMP_EXTRACT_PATH\*" | Move-Item -Destination $SHADERPACKS_FOLDER -Force
-    Remove-Item -Recurse -Force $TEMP_EXTRACT_PATH
-
-    # Clean up the downloaded shaderpacks archive file
+    # Clean up the downloaded archive file and temporary extract folder
     Write-Host "Cleaning up..."
     Remove-Item $DOWNLOAD_SHADERPACKS_FILE
+    Remove-Item -Recurse -Force $TEMP_EXTRACT_PATH
     Write-Host "Shaderpacks update complete!"
 } else {
     Write-Host "Download failed. Please check the download link and try again."
@@ -142,7 +142,7 @@ if (Test-Path $DOWNLOAD_SHADERPACKS_FILE) {
 # Ensure resourcepacks folder exists
 if (-Not (Test-Path $RESOURCEPACKS_FOLDER)) {
     Write-Host "Creating resourcepacks folder..."
-    New-Item -ItemType Directory -Force -Path $RESOURCEPACKS_FOLDER
+    New-Item -ItemType Directory -Force -Path $RESOURCEPACKS_FOLDER | Out-Null
 }
 
 # Download the resourcepacks zip from Google Drive using gdown
@@ -158,18 +158,13 @@ if (Test-Path $DOWNLOAD_RESOURCEPACKS_FILE) {
     $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_RESOURCEPACKS_FILE`" -o`"$TEMP_EXTRACT_PATH`" -y"
     Invoke-Expression $extractCommand
 
-    # Remove any existing conflicting folders in the destination
-    if (Test-Path "$RESOURCEPACKS_FOLDER\resourcepacks") {
-        Remove-Item -Recurse -Force "$RESOURCEPACKS_FOLDER\resourcepacks"
-    }
+    # Move files from the temporary location to the resourcepacks folder
+    Get-ChildItem "$TEMP_EXTRACT_PATH\*" -Recurse | Move-Item -Destination $RESOURCEPACKS_FOLDER -Force
 
-    # Move files from the temporary extraction path to the resourcepacks folder
-    Get-ChildItem -Path "$TEMP_EXTRACT_PATH\*" | Move-Item -Destination $RESOURCEPACKS_FOLDER -Force
-    Remove-Item -Recurse -Force $TEMP_EXTRACT_PATH
-
-    # Clean up the downloaded resourcepacks archive file
+    # Clean up the downloaded archive file and temporary extract folder
     Write-Host "Cleaning up..."
     Remove-Item $DOWNLOAD_RESOURCEPACKS_FILE
+    Remove-Item -Recurse -Force $TEMP_EXTRACT_PATH
     Write-Host "Resourcepacks update complete!"
 } else {
     Write-Host "Download failed. Please check the download link and try again."
@@ -184,7 +179,7 @@ if (-Not (Test-Path $DOWNLOAD_OPTIONS_SHADERS_FILE)) {
 if (Test-Path $DOWNLOAD_OPTIONS_SHADERS_FILE) {
     # Move the downloaded optionsshaders.txt to the Minecraft folder
     Write-Host "Moving optionsshaders.txt to the Minecraft folder..."
-    Move-Item -Force -Path $DOWNLOAD_OPTIONS_SHADERS_FILE -Destination "$EXTRACT_PATH\optionsshaders.txt"
+    Move-Item -Force -Path $DOWNLOAD_OPTIONS_SHADERS_FILE -Destination "$env:APPDATA\.minecraft\optionsshaders.txt"
     Write-Host "Options shaders update complete!"
 } else {
     Write-Host "Download failed. Please check the download link and try again."
@@ -199,7 +194,7 @@ if (-Not (Test-Path $DOWNLOAD_OPTIONS_FILE)) {
 if (Test-Path $DOWNLOAD_OPTIONS_FILE) {
     # Move the downloaded options.txt to the Minecraft folder
     Write-Host "Moving options.txt to the Minecraft folder..."
-    Move-Item -Force -Path $DOWNLOAD_OPTIONS_FILE -Destination "$EXTRACT_PATH\options.txt"
+    Move-Item -Force -Path $DOWNLOAD_OPTIONS_FILE -Destination "$env:APPDATA\.minecraft\options.txt"
     Write-Host "Options update complete!"
 } else {
     Write-Host "Download failed. Please check the download link and try again."

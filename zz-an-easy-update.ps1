@@ -35,13 +35,14 @@ $DOWNLOAD_SHADERPACKS_FILE = "$env:TEMP\shaderpacks.zip"
 $DOWNLOAD_RESOURCEPACKS_FILE = "$env:TEMP\resourcepacks.zip"
 $DOWNLOAD_OPTIONS_SHADERS_FILE = "$env:TEMP\optionsshaders.txt"
 $DOWNLOAD_OPTIONS_FILE = "$env:TEMP\options.txt"
+$COOKIES_PATH = "$env:USERPROFILE\.cache\gdown\cookies.txt"
 
 # Ensure the temporary extract path exists
 if (-Not (Test-Path $TEMP_EXTRACT_PATH)) {
     New-Item -ItemType Directory -Force -Path $TEMP_EXTRACT_PATH | Out-Null
 }
 
-# Function to download files using Invoke-WebRequest with Google Drive support
+# Function to download files using gdown with cookies.txt
 function Download-File {
     param (
         [string]$url,
@@ -49,22 +50,16 @@ function Download-File {
     )
     Write-Host "Downloading $output..."
     try {
-        $response = Invoke-WebRequest -Uri $url -MaximumRedirection 0 -ErrorAction Stop -UseBasicParsing
-
-        if ($response.StatusCode -eq 302) {
-            $redirectUrl = $response.Headers.Location
-            Write-Host "Redirecting to $redirectUrl"
-            Invoke-WebRequest -Uri $redirectUrl -OutFile $output -ErrorAction Stop
-        } else {
-            Invoke-WebRequest -Uri $url -OutFile $output -ErrorAction Stop
+        $cookiesOption = ""
+        if (Test-Path $COOKIES_PATH) {
+            $cookiesOption = "--cookies $COOKIES_PATH"
         }
-
+        & "python" -c "import gdown; gdown.download('$url', r'$output', quiet=False, fuzzy=True, use_cookies=True)"
         # Check the file size to ensure it is not an HTML error page
         $fileSize = (Get-Item $output).Length
         if ($fileSize -lt 1024) {
             throw "Downloaded file is too small to be valid. Please check the permissions and the link."
         }
-
         Write-Host "Downloaded $output successfully."
     } catch {
         Write-Host "Download failed for $output. Error: $_"
@@ -215,8 +210,7 @@ if (Test-Path $DOWNLOAD_OPTIONS_FILE) {
     Write-Host "Download failed. Please check the download link and try again."
 }
 
-# Restore original execution policy
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy $originalExecutionPolicy -Force
-
 Write-Host "Update process complete!"
-Pause
+Write-Host "Press Enter to continue..."
+[System.Console]::ReadKey() | Out-Null
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy $originalExecutionPolicy -Force

@@ -13,12 +13,15 @@ function Write-Log {
 }
 
 # Ensure Minecraft is closed before running this script
+Write-Host ""
 Write-Host "Before running this script:"
 Write-Host "	- Close Minecraft."
+Write-Host ""
 Write-Host "	- Verify that the following are installed on your PC:"
 Write-Host "		- Python"
 Write-Host "		- PIP"
 Write-Host "		- 7-zip"
+Write-Host ""
 
 # Execution policy change
 $originalExecutionPolicy = Get-ExecutionPolicy

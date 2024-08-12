@@ -106,6 +106,7 @@ if ((Test-Path $DOWNLOAD_FILE) -and (Get-Item $DOWNLOAD_FILE).Length -gt 1024) {
 }
 
 Write-Host "Update process complete!"
+Write-Host "IP Address: 51.79.77.46:25600"
 Write-Host "Press Enter to continue..."
 [System.Console]::ReadKey() | Out-Null
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy $originalExecutionPolicy -Force

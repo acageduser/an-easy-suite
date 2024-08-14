@@ -4,7 +4,6 @@
 Write-Host ""
 Write-Host "Before running this script:"
 Write-Host "    - Close Minecraft."
-Write-Host ""
 Write-Host "    - Verify that the following are installed on your PC:"
 Write-Host "        - Python"
 Write-Host "        - PIP"

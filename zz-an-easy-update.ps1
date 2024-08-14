@@ -75,17 +75,21 @@ if (-Not (Test-Path $DOWNLOAD_FILE)) {
     Download-File -url $GDRIVE_URL -output $DOWNLOAD_FILE
 }
 
-# Check if the download was successful and is a valid zip file
-if ((Test-Path $DOWNLOAD_FILE) -and (Get-Item $DOWNLOAD_FILE).Length -gt 1024) {
-    # Extract the downloaded archive using 7-Zip to a temporary location
-    Write-Host "Extracting .minecraft with 7-Zip..."
-    $7zipPath = "C:\Program Files\7-Zip\7z.exe" # Adjust this path if 7-Zip is installed elsewhere
-    $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_FILE`" -o`"$TEMP_EXTRACT_PATH`" -y"
-    Invoke-Expression $extractCommand
+# Extract the downloaded archive using 7-Zip to a temporary location
+Write-Host "Extracting .minecraft with 7-Zip..."
+$7zipPath = "C:\Program Files\7-Zip\7z.exe" # Ensure 7-Zip path is correct
+$extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_FILE`" -o`"$TEMP_EXTRACT_PATH`" -y"
+Invoke-Expression $extractCommand
 
-    # Move folders to the .minecraft folder
-    Get-ChildItem "$TEMP_EXTRACT_PATH\.minecraft\*" | ForEach-Object {
-        $dest = "$MINECRAFT_FOLDER\$($_.Name)"
+# Debug: List files in temporary extract path
+Write-Host "Listing contents of $TEMP_EXTRACT_PATH:"
+Get-ChildItem -Path $TEMP_EXTRACT_PATH -Force | ForEach-Object { Write-Host $_.FullName }
+
+# Move folders to the .minecraft folder
+$minecraftTempPath = Join-Path -Path $TEMP_EXTRACT_PATH -ChildPath ".minecraft"
+if (Test-Path $minecraftTempPath) {
+    Get-ChildItem "$minecraftTempPath\*" | ForEach-Object {
+        $dest = Join-Path -Path $MINECRAFT_FOLDER -ChildPath $_.Name
         if ($_.PSIsContainer) {
             if (Test-Path $dest) {
                 Remove-Item -Recurse -Force $dest
@@ -95,17 +99,12 @@ if ((Test-Path $DOWNLOAD_FILE) -and (Get-Item $DOWNLOAD_FILE).Length -gt 1024) {
             Move-Item -Force -Path $_.FullName -Destination $dest
         }
     }
-
-    # Clean up the downloaded archive file and temporary extract folder
-    Write-Host "Cleaning up..."
-    Remove-Item $DOWNLOAD_FILE
-    Remove-Item -Recurse -Force $TEMP_EXTRACT_PATH
-    Write-Host "Update complete!"
 } else {
-    Write-Host "Download failed or the file is not a valid archive. Please check the download link and try again."
+    Write-Host "Error: .minecraft directory not found in $minecraftTempPath."
 }
 
-Write-Host "Update process complete!"
-Write-Host "Press Enter to continue..."
-[System.Console]::ReadKey() | Out-Null
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy $originalExecutionPolicy -Force
+# Clean up the downloaded archive file and temporary extract folder
+Write-Host "Cleaning up..."
+Remove-Item $DOWNLOAD_FILE
+Remove-Item -Recurse -Force $TEMP_EXTRACT_PATH
+Write-Host "Update complete!"

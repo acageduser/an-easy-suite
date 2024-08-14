@@ -113,11 +113,17 @@ Remove-Item $DOWNLOAD_FILE
 Remove-Item -Recurse -Force $TEMP_EXTRACT_PATH
 Clear-Host
 
-Write-Host "           __..--''``---....___   _..._    __"
-Write-Host " /// //_.-'    .-/`;  `        ``<._  ``.''_ `. / // / "
-Write-Host "///_.-' _..--.'_    \                    `( ) ) // // "
-Write-Host "/ (_..-' // (< _     ;_..__               ; `' / /// "
-Write-Host " / // // //  `-._,_)' // / ``--...____..-' /// / // "
+Write-Host "        _____"
+Write-Host "    ,-:` \;',`'-, "
+Write-Host "  .'-;_,;  ':-;_,'."
+Write-Host " /;   '/    ,  _`.-\"
+Write-Host "| '`. (`     /` ` \`|"
+Write-Host "|:.  `\`-.   \_   / |"
+Write-Host "|     (   `,  .`\ ;'|"
+Write-Host " \     | .'     `-'/"
+Write-Host "  `.   ;/        .'"
+Write-Host "    `'-._____."
+Write-Host ""
 
 
 Write-Host "Update complete!!"

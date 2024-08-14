@@ -4,6 +4,7 @@
 Write-Host ""
 Write-Host "Before running this script:"
 Write-Host "    - Close Minecraft."
+Write-Host ""
 Write-Host "    - Verify that the following are installed on your PC:"
 Write-Host "        - Python"
 Write-Host "        - PIP"
@@ -84,22 +85,20 @@ Invoke-Expression $extractCommand
 Write-Host ("Listing contents of " + $TEMP_EXTRACT_PATH + ":")
 Get-ChildItem -Path $TEMP_EXTRACT_PATH -Force | ForEach-Object { Write-Host $_.FullName }
 
-# Move folders to the .minecraft folder
+# Check if .minecraft directory is correctly located in the extracted path
 $minecraftTempPath = Join-Path -Path $TEMP_EXTRACT_PATH -ChildPath ".minecraft"
 if (Test-Path $minecraftTempPath) {
-    Get-ChildItem "$minecraftTempPath\*" | ForEach-Object {
+    # Move folders to the .minecraft folder
+    Get-ChildItem "$minecraftTempPath\*" -Directory | ForEach-Object {
         $dest = Join-Path -Path $MINECRAFT_FOLDER -ChildPath $_.Name
-        if ($_.PSIsContainer) {
-            if (Test-Path $dest) {
-                Remove-Item -Recurse -Force $dest
-            }
-            Move-Item -Force -Path $_.FullName -Destination $dest
-        } else {
-            Move-Item -Force -Path $_.FullName -Destination $dest
+        Write-Host "Moving $_.Name to $MINECRAFT_FOLDER"
+        if (Test-Path $dest) {
+            Remove-Item -Recurse -Force $dest
         }
+        Move-Item -Path $_.FullName -Destination $dest
     }
 } else {
-    Write-Host "Error: .minecraft directory not found in $minecraftTempPath."
+    Write-Host "Error: '.minecraft' directory not found in the extracted path."
 }
 
 # Clean up the downloaded archive file and temporary extract folder

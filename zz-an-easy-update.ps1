@@ -1,10 +1,12 @@
-# zz-an-easy-update.ps1
 Clear-Host
-# Set the console output to UTF-8
+# Set the console output and input to UTF-8
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
-Write-Host "Current Output Encoding: " [Console]::OutputEncoding
+[Console]::InputEncoding = [System.Text.Encoding]::UTF8
 
-Write-Host "Ensure Minecraft is closed before running this script"
+Write-Host "Current Output Encoding: " + [Console]::OutputEncoding.EncodingName
+Write-Host "Current Input Encoding: " + [Console]::InputEncoding.EncodingName
+
+Write-Host "!! Ensure Minecraft is closed before running this script !!"
 Write-Host ""
 Write-Host "Before running this script:"
 Write-Host "    1.  Close Minecraft."
@@ -79,7 +81,7 @@ if (-Not (Test-Path $DOWNLOAD_FILE)) {
 }
 
 Clear-Host
-Write-Host "Ensure Minecraft is closed before running this script"
+Write-Host "!! Ensure Minecraft is closed before running this script !!"
 Write-Host ""
 Write-Host "Before running this script:"
 Write-Host "    1.  Close Minecraft."

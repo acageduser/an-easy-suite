@@ -2,6 +2,7 @@
 Clear-Host
 # Set the console output to UTF-8
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+Write-Host "Current Output Encoding: " [Console]::OutputEncoding
 
 Write-Host "Ensure Minecraft is closed before running this script"
 Write-Host ""

@@ -96,7 +96,7 @@ Get-ChildItem "$TEMP_EXTRACT_PATH\*" -Directory | ForEach-Object {
 }
 
 # Clean up the downloaded archive file and temporary extract folder
-# Write-Host "Cleaning up..."
+Write-Host "Cleaning up..."
 Remove-Item $DOWNLOAD_FILE
 Remove-Item -Recurse -Force $TEMP_EXTRACT_PATH
 Write-Host ""

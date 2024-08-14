@@ -56,17 +56,17 @@ function Download-File {
 
 # Delete the local mods, shaderpacks, and resourcepacks folders before extracting the new ones
 if (Test-Path "$MINECRAFT_FOLDER\mods") {
-    Write-Host "Deleting existing mods folder..."
+    # Write-Host "Deleting existing mods folder..."
     Remove-Item -Recurse -Force "$MINECRAFT_FOLDER\mods"
 }
 
 if (Test-Path "$MINECRAFT_FOLDER\shaderpacks") {
-    Write-Host "Deleting existing shaderpacks folder..."
+    # Write-Host "Deleting existing shaderpacks folder..."
     Remove-Item -Recurse -Force "$MINECRAFT_FOLDER\shaderpacks"
 }
 
 if (Test-Path "$MINECRAFT_FOLDER\resourcepacks") {
-    Write-Host "Deleting existing resourcepacks folder..."
+    # Write-Host "Deleting existing resourcepacks folder..."
     Remove-Item -Recurse -Force "$MINECRAFT_FOLDER\resourcepacks"
 }
 
@@ -76,19 +76,19 @@ if (-Not (Test-Path $DOWNLOAD_FILE)) {
 }
 
 # Extract the downloaded archive using 7-Zip to a temporary location
-Write-Host "Extracting .minecraft with 7-Zip..."
+# Write-Host "Extracting .minecraft with 7-Zip..."
 $7zipPath = "C:\Program Files\7-Zip\7z.exe"
 $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_FILE`" -o`"$TEMP_EXTRACT_PATH`" -y"
 Invoke-Expression $extractCommand
 
 # Debug: List files in temporary extract path
-Write-Host ("Listing contents of " + $TEMP_EXTRACT_PATH + ":")
-Get-ChildItem -Path $TEMP_EXTRACT_PATH -Force | ForEach-Object { Write-Host $_.FullName }
+# Write-Host ("Listing contents of " + $TEMP_EXTRACT_PATH + ":")
+Get-ChildItem -Path $TEMP_EXTRACT_PATH -Force | ForEach-Object { # Write-Host $_.FullName }
 
 # Move folders to the .minecraft folder directly since they are at the root of the extract
 Get-ChildItem "$TEMP_EXTRACT_PATH\*" -Directory | ForEach-Object {
     $dest = Join-Path -Path $MINECRAFT_FOLDER -ChildPath $_.Name
-    Write-Host "Moving $_.Name to $dest"
+    # Write-Host "Moving $_.Name to $dest"
     if (Test-Path $dest) {
         Remove-Item -Recurse -Force $dest
     }
@@ -101,7 +101,11 @@ Remove-Item $DOWNLOAD_FILE
 Remove-Item -Recurse -Force $TEMP_EXTRACT_PATH
 Write-Host "Update complete!"
 
-Write-Host "Update process complete!"
+Write-Host ""
+Write-Host "IP Address: 51.79.77.46:25600"
+Write-Host "Use Minecraft 1.20.1 v47.3.0 | https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html"
+Write-Host ""
+
 Write-Host "Press Enter to continue..."
 [System.Console]::ReadKey() | Out-Null
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy $originalExecutionPolicy -Force

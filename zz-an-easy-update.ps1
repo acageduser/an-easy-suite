@@ -78,6 +78,18 @@ if (-Not (Test-Path $DOWNLOAD_FILE)) {
     Download-File -url $GDRIVE_URL -output $DOWNLOAD_FILE
 }
 
+Clear-Host
+Write-Host "Ensure Minecraft is closed before running this script"
+Write-Host ""
+Write-Host "Before running this script:"
+Write-Host "    1.  Close Minecraft."
+Write-Host "    2.  Verify that the following are installed on your PC:"
+Write-Host "         - Python"
+Write-Host "         - PIP"
+Write-Host "         - 7-zip"
+Write-Host ""
+
+
 # Extract the downloaded archive using 7-Zip to a temporary location
 # Write-Host "Extracting .minecraft with 7-Zip..."
 $7zipPath = "C:\Program Files\7-Zip\7z.exe"

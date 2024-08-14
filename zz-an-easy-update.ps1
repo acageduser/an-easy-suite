@@ -1,4 +1,7 @@
 # zz-an-easy-update.ps1
+# Set the console output to UTF-8
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+
 Clear-Host
 Write-Host "Ensure Minecraft is closed before running this script"
 Write-Host ""

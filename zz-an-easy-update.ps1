@@ -77,12 +77,12 @@ if (-Not (Test-Path $DOWNLOAD_FILE)) {
 
 # Extract the downloaded archive using 7-Zip to a temporary location
 Write-Host "Extracting .minecraft with 7-Zip..."
-$7zipPath = "C:\Program Files\7-Zip\7z.exe" # Ensure 7-Zip path is correct
+$7zipPath = "C:\Program Files\7-Zip\7z.exe"
 $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_FILE`" -o`"$TEMP_EXTRACT_PATH`" -y"
 Invoke-Expression $extractCommand
 
 # Debug: List files in temporary extract path
-Write-Host "Listing contents of $TEMP_EXTRACT_PATH:"
+Write-Host ("Listing contents of " + $TEMP_EXTRACT_PATH + ":")
 Get-ChildItem -Path $TEMP_EXTRACT_PATH -Force | ForEach-Object { Write-Host $_.FullName }
 
 # Move folders to the .minecraft folder
@@ -108,3 +108,8 @@ Write-Host "Cleaning up..."
 Remove-Item $DOWNLOAD_FILE
 Remove-Item -Recurse -Force $TEMP_EXTRACT_PATH
 Write-Host "Update complete!"
+
+Write-Host "Update process complete!"
+Write-Host "Press Enter to continue..."
+[System.Console]::ReadKey() | Out-Null
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy $originalExecutionPolicy -Force

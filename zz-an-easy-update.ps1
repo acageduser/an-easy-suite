@@ -1,15 +1,15 @@
 # zz-an-easy-update.ps1
 
 # Ensure Minecraft is closed before running this script
-Write-Host ""
-Write-Host "Before running this script:"
-Write-Host "    - Close Minecraft."
-Write-Host ""
-Write-Host "    - Verify that the following are installed on your PC:"
-Write-Host "        - Python"
-Write-Host "        - PIP"
-Write-Host "        - 7-zip"
-Write-Host ""
+# Write-Host ""
+# Write-Host "Before running this script:"
+# Write-Host "    - Close Minecraft."
+# Write-Host ""
+# Write-Host "    - Verify that the following are installed on your PC:"
+# Write-Host "        - Python"
+# Write-Host "        - PIP"
+# Write-Host "        - 7-zip"
+# Write-Host ""
 
 # Execution policy change
 $originalExecutionPolicy = Get-ExecutionPolicy
@@ -35,7 +35,7 @@ function Download-File {
         [string]$url,
         [string]$output
     )
-    Write-Host "Downloading $output..."
+    # Write-Host "Downloading $output..."
     try {
         $cookiesOption = ""
         if (Test-Path $COOKIES_PATH) {
@@ -47,9 +47,9 @@ function Download-File {
         if ($fileSize -lt 1024) {
             throw "Downloaded file is too small to be valid. Please check the permissions and the link."
         }
-        Write-Host "Downloaded $output successfully."
+        # Write-Host "Downloaded $output successfully."
     } catch {
-        Write-Host "Download failed for $output. Error: $_"
+        # Write-Host "Download failed for $output. Error: $_"
         exit 1
     }
 }
@@ -83,7 +83,7 @@ Invoke-Expression $extractCommand
 
 # Debug: List files in temporary extract path
 # Write-Host ("Listing contents of " + $TEMP_EXTRACT_PATH + ":")
-Get-ChildItem -Path $TEMP_EXTRACT_PATH -Force | ForEach-Object { Write-Host $_.FullName }
+Get-ChildItem -Path $TEMP_EXTRACT_PATH -Force | ForEach-Object { # Write-Host $_.FullName }
 
 # Move folders to the .minecraft folder directly since they are at the root of the extract
 Get-ChildItem "$TEMP_EXTRACT_PATH\*" -Directory | ForEach-Object {
@@ -96,7 +96,7 @@ Get-ChildItem "$TEMP_EXTRACT_PATH\*" -Directory | ForEach-Object {
 }
 
 # Clean up the downloaded archive file and temporary extract folder
-Write-Host "Cleaning up..."
+# Write-Host "Cleaning up..."
 Remove-Item $DOWNLOAD_FILE
 Remove-Item -Recurse -Force $TEMP_EXTRACT_PATH
 Write-Host "Update complete!"

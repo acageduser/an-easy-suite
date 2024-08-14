@@ -85,20 +85,14 @@ Invoke-Expression $extractCommand
 Write-Host ("Listing contents of " + $TEMP_EXTRACT_PATH + ":")
 Get-ChildItem -Path $TEMP_EXTRACT_PATH -Force | ForEach-Object { Write-Host $_.FullName }
 
-# Check if .minecraft directory is correctly located in the extracted path
-$minecraftTempPath = Join-Path -Path $TEMP_EXTRACT_PATH -ChildPath ".minecraft"
-if (Test-Path $minecraftTempPath) {
-    # Move folders to the .minecraft folder
-    Get-ChildItem "$minecraftTempPath\*" -Directory | ForEach-Object {
-        $dest = Join-Path -Path $MINECRAFT_FOLDER -ChildPath $_.Name
-        Write-Host "Moving $_.Name to $MINECRAFT_FOLDER"
-        if (Test-Path $dest) {
-            Remove-Item -Recurse -Force $dest
-        }
-        Move-Item -Path $_.FullName -Destination $dest
+# Move folders to the .minecraft folder directly since they are at the root of the extract
+Get-ChildItem "$TEMP_EXTRACT_PATH\*" -Directory | ForEach-Object {
+    $dest = Join-Path -Path $MINECRAFT_FOLDER -ChildPath $_.Name
+    Write-Host "Moving $_.Name to $dest"
+    if (Test-Path $dest) {
+        Remove-Item -Recurse -Force $dest
     }
-} else {
-    Write-Host "Error: '.minecraft' directory not found in the extracted path."
+    Move-Item -Path $_.FullName -Destination $dest
 }
 
 # Clean up the downloaded archive file and temporary extract folder

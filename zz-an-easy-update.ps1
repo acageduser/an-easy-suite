@@ -83,7 +83,7 @@ Invoke-Expression $extractCommand
 
 # Debug: List files in temporary extract path
 # Write-Host ("Listing contents of " + $TEMP_EXTRACT_PATH + ":")
-Get-ChildItem -Path $TEMP_EXTRACT_PATH -Force | ForEach-Object { # Write-Host $_.FullName }
+Get-ChildItem -Path $TEMP_EXTRACT_PATH -Force | ForEach-Object { Write-Host $_.FullName }
 
 # Move folders to the .minecraft folder directly since they are at the root of the extract
 Get-ChildItem "$TEMP_EXTRACT_PATH\*" -Directory | ForEach-Object {

@@ -120,15 +120,27 @@ Write-Host " \     | .'     '-'/"
 Write-Host "  '.   ;/        .'"
 Write-Host "    ''-._____."
 Write-Host ""
+mods, shaderpacks, and resourcepacks folders
+'options.txt' 'optionsof.txt' 'optionsshaders.txt' 'servers.dat' and 'servers.dat_old' files
 
 
 Write-Host "Update complete!!"
-
+Write-Host ""
+Write-Host "Folders Updated:"
+Write-Host "	- mods"
+Write-Host "	- shaderpacks"
+Write-Host "	- resourcepacks"
+Write-Host ""
+Write-Host "Files Updated:"
+Write-Host "	- options.txt"
+Write-Host "	- optionsof.txt"
+Write-Host "	- optionsshaders.txt"
+Write-Host "	- servers.dat"
+Write-Host "	- servers.dat_old"
 Write-Host ""
 Write-Host "World IP Address: 51.79.77.46:25600"
 Write-Host "Use Minecraft 1.20.1 v47.3.0 | https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html"
 Write-Host ""
-
 Write-Host "Press Enter to continue..."
 [System.Console]::ReadKey() | Out-Null
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy $originalExecutionPolicy -Force

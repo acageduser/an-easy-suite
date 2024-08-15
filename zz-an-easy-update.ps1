@@ -14,7 +14,7 @@ $originalExecutionPolicy = Get-ExecutionPolicy
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned -Force
 
 # Google Drive URL
-$GDRIVE_URL = "https://drive.google.com/uc?export=download&id=1vWCWGPyUZrioDOvJK_sNL32O1q6nwqYN"
+$GDRIVE_URL = "https://drive.google.com/uc?export=download&id=19Y9HV7bJdSt2VyyVUUXkujZTfbDbtrbD"
 
 # Paths
 $MINECRAFT_FOLDER = "$env:APPDATA\.minecraft"

@@ -1,8 +1,6 @@
 # zz-an-easy-update.ps1
 Clear-Host
 
-Write-Host "!! Ensure Minecraft is closed before running this script !!"
-Write-Host ""
 Write-Host "Before running this script:"
 Write-Host "    1.  Close Minecraft."
 Write-Host "    2.  Verify that the following are installed on your PC:"
@@ -74,8 +72,6 @@ if (-Not (Test-Path $DOWNLOAD_FILE)) {
 }
 
 Clear-Host
-Write-Host "!! Ensure Minecraft is closed before running this script !!"
-Write-Host ""
 Write-Host "Before running this script:"
 Write-Host "    1.  Close Minecraft."
 Write-Host "    2.  Verify that the following are installed on your PC:"
@@ -96,6 +92,15 @@ Get-ChildItem "$TEMP_EXTRACT_PATH\*" -Directory | ForEach-Object {
         Remove-Item -Recurse -Force $dest
     }
     Move-Item -Path $_.FullName -Destination $dest
+}
+
+# Move specific files to the .minecraft folder
+$filesToMove = @("options.txt", "optionsof.txt", "optionsshaders.txt", "servers.dat", "servers.dat_old")
+foreach ($file in $filesToMove) {
+    $sourceFile = Join-Path -Path $TEMP_EXTRACT_PATH -ChildPath $file
+    if (Test-Path $sourceFile) {
+        Move-Item -Path $sourceFile -Destination $MINECRAFT_FOLDER
+    }
 }
 
 # Clean up the downloaded archive file and temporary extract folder

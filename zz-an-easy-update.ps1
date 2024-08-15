@@ -48,8 +48,8 @@ function Download-File {
     }
 }
 
-# Delete the local mods, shaderpacks, resourcepacks, and journeymap folders before extracting the new ones
-$foldersToDelete = @("mods", "shaderpacks", "resourcepacks", "journeymap")
+# Delete the local mods, shaderpacks, resourcepacks, journeymap, and config folders before extracting the new ones
+$foldersToDelete = @("mods", "shaderpacks", "resourcepacks", "journeymap", "config")
 foreach ($folder in $foldersToDelete) {
     $folderPath = "$MINECRAFT_FOLDER\$folder"
     if (Test-Path $folderPath) {
@@ -86,7 +86,7 @@ $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_FILE`" -o`"$TEMP_EXTRACT_PATH`"
 Invoke-Expression $extractCommand
 
 # Move folders to the .minecraft folder directly since they are at the root of the extract
-$foldersToMove = @("mods", "shaderpacks", "resourcepacks", "journeymap")
+$foldersToMove = @("mods", "shaderpacks", "resourcepacks", "journeymap", "config")
 foreach ($folder in $foldersToMove) {
     $dest = Join-Path -Path $MINECRAFT_FOLDER -ChildPath $folder
     $sourceFolder = Join-Path -Path $TEMP_EXTRACT_PATH -ChildPath $folder
@@ -144,6 +144,7 @@ Write-Host ""
 Write-Host "World IP Address: 51.79.77.46:25600"
 Write-Host "Use Minecraft 1.20.1 v47.3.0 | https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html"
 Write-Host ""
+Write-Host "Remember to allocate 8GB of ram to the game before starting it!"
 Write-Host "Press Enter to continue..."
 [System.Console]::ReadKey() | Out-Null
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy $originalExecutionPolicy -Force

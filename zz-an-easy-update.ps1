@@ -120,8 +120,6 @@ Write-Host " \     | .'     '-'/"
 Write-Host "  '.   ;/        .'"
 Write-Host "    ''-._____."
 Write-Host ""
-mods, shaderpacks, and resourcepacks folders
-'options.txt' 'optionsof.txt' 'optionsshaders.txt' 'servers.dat' and 'servers.dat_old' files
 
 
 Write-Host "Update complete!!"

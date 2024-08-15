@@ -35,39 +35,37 @@ function Download-File {
         [string]$url,
         [string]$output
     )
-    # Write-Host "Downloading $output..."
     try {
         $cookiesOption = ""
         if (Test-Path $COOKIES_PATH) {
             $cookiesOption = "--cookies $COOKIES_PATH"
         }
         & "python" -c "import gdown; gdown.download('$url', r'$output', quiet=False, fuzzy=True, use_cookies=True)"
-        # Check the file size to ensure it is not an HTML error page
         $fileSize = (Get-Item $output).Length
         if ($fileSize -lt 1024) {
             throw "Downloaded file is too small to be valid. Please check the permissions and the link."
         }
-        # Write-Host "Downloaded $output successfully."
     } catch {
-        # Write-Host "Download failed for $output. Error: $_"
         exit 1
     }
 }
 
 # Delete the local mods, shaderpacks, and resourcepacks folders before extracting the new ones
-if (Test-Path "$MINECRAFT_FOLDER\mods") {
-    # Write-Host "Deleting existing mods folder..."
-    Remove-Item -Recurse -Force "$MINECRAFT_FOLDER\mods"
+$foldersToDelete = @("mods", "shaderpacks", "resourcepacks")
+foreach ($folder in $foldersToDelete) {
+    $folderPath = "$MINECRAFT_FOLDER\$folder"
+    if (Test-Path $folderPath) {
+        Remove-Item -Recurse -Force $folderPath
+    }
 }
 
-if (Test-Path "$MINECRAFT_FOLDER\shaderpacks") {
-    # Write-Host "Deleting existing shaderpacks folder..."
-    Remove-Item -Recurse -Force "$MINECRAFT_FOLDER\shaderpacks"
-}
-
-if (Test-Path "$MINECRAFT_FOLDER\resourcepacks") {
-    # Write-Host "Deleting existing resourcepacks folder..."
-    Remove-Item -Recurse -Force "$MINECRAFT_FOLDER\resourcepacks"
+# Delete the specific files before extracting the new ones
+$filesToDelete = @("options.txt", "optionsof.txt", "optionsshaders.txt", "servers.dat", "servers.dat_old")
+foreach ($file in $filesToDelete) {
+    $filePath = "$MINECRAFT_FOLDER\$file"
+    if (Test-Path $filePath) {
+        Remove-Item -Force $filePath
+    }
 }
 
 # Download the .minecraft zip from Google Drive
@@ -86,21 +84,14 @@ Write-Host "         - PIP"
 Write-Host "         - 7-zip"
 Write-Host ""
 
-
 # Extract the downloaded archive using 7-Zip to a temporary location
-# Write-Host "Extracting .minecraft with 7-Zip..."
 $7zipPath = "C:\Program Files\7-Zip\7z.exe"
 $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_FILE`" -o`"$TEMP_EXTRACT_PATH`" -y"
 Invoke-Expression $extractCommand
 
-# Debug: List files in temporary extract path
-# Write-Host ("Listing contents of " + $TEMP_EXTRACT_PATH + ":")
-Get-ChildItem -Path $TEMP_EXTRACT_PATH -Force | ForEach-Object { Write-Host $_.FullName }
-
 # Move folders to the .minecraft folder directly since they are at the root of the extract
 Get-ChildItem "$TEMP_EXTRACT_PATH\*" -Directory | ForEach-Object {
     $dest = Join-Path -Path $MINECRAFT_FOLDER -ChildPath $_.Name
-    # Write-Host "Moving $_.Name to $dest"
     if (Test-Path $dest) {
         Remove-Item -Recurse -Force $dest
     }
@@ -114,15 +105,15 @@ Remove-Item -Recurse -Force $TEMP_EXTRACT_PATH
 Clear-Host
 
 Write-Host "        _____"
-Write-Host "    ,-:` \;',`'-, "
+Write-Host "    ,-:' \;',''-, "
 Write-Host "  .'-;_,;  ':-;_,'."
-Write-Host " /;   '/    ,  _`.-\"
-Write-Host "| '`. (`     /` ` \`|"
-Write-Host "|:.  `\`-.   \_   / |"
-Write-Host "|     (   `,  .`\ ;'|"
-Write-Host " \     | .'     `-'/"
-Write-Host "  `.   ;/        .'"
-Write-Host "    `'-._____."
+Write-Host " /;   '/    ,  _'.-\"
+Write-Host "| ''. ('     /' ' \'|"
+Write-Host "|:.  '\'-.   \_   / |"
+Write-Host "|     (   ',  .'\ ;'|"
+Write-Host " \     | .'     '-'/"
+Write-Host "  '.   ;/        .'"
+Write-Host "    ''-._____."
 Write-Host ""
 
 

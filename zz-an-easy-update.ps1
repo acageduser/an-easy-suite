@@ -48,8 +48,8 @@ function Download-File {
     }
 }
 
-# Delete the local mods, shaderpacks, and resourcepacks folders before extracting the new ones
-$foldersToDelete = @("mods", "shaderpacks", "resourcepacks")
+# Delete the local mods, shaderpacks, resourcepacks, and journeymap folders before extracting the new ones
+$foldersToDelete = @("mods", "shaderpacks", "resourcepacks", "journeymap")
 foreach ($folder in $foldersToDelete) {
     $folderPath = "$MINECRAFT_FOLDER\$folder"
     if (Test-Path $folderPath) {
@@ -86,12 +86,16 @@ $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_FILE`" -o`"$TEMP_EXTRACT_PATH`"
 Invoke-Expression $extractCommand
 
 # Move folders to the .minecraft folder directly since they are at the root of the extract
-Get-ChildItem "$TEMP_EXTRACT_PATH\*" -Directory | ForEach-Object {
-    $dest = Join-Path -Path $MINECRAFT_FOLDER -ChildPath $_.Name
-    if (Test-Path $dest) {
-        Remove-Item -Recurse -Force $dest
+$foldersToMove = @("mods", "shaderpacks", "resourcepacks", "journeymap")
+foreach ($folder in $foldersToMove) {
+    $dest = Join-Path -Path $MINECRAFT_FOLDER -ChildPath $folder
+    $sourceFolder = Join-Path -Path $TEMP_EXTRACT_PATH -ChildPath $folder
+    if (Test-Path $sourceFolder) {
+        if (Test-Path $dest) {
+            Remove-Item -Recurse -Force $dest
+        }
+        Move-Item -Path $sourceFolder -Destination $dest
     }
-    Move-Item -Path $_.FullName -Destination $dest
 }
 
 # Move specific files to the .minecraft folder

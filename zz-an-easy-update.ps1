@@ -181,9 +181,24 @@ Write-Host ""
 
 Write-Host "Update complete!!"
 Write-Host ""
-Write-Host "Use Minecraft 1.20.1 v47.3.0 | https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html"
+Write-Host "**IMPORTANT**"
+Write-Host " 1.  Use Minecraft 1.20.1 v47.3.0 (Recommended Installer)"
+Write-Host " 2.  Remember to allocate 8GB of RAM to the game before starting it!"
 Write-Host ""
-Write-Host "Remember to allocate 8GB of ram to the game before starting it!"
-Write-Host "Press Enter to continue..."
-[System.Console]::ReadKey() | Out-Null
+Write-Host "Menu:"
+Write-Host " 1. Open the Minecraft 1.20.1 v47.3.0 in Google Chrome"
+Write-Host "Press Enter to exit the script."
+
+$input = Read-Host "Enter your choice:  "
+
+switch ($input) {
+    "1" {
+        Write-Host "Opening the link in Google Chrome..."
+        Start-Process "chrome.exe" "https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html"
+    }
+    default {
+        Write-Host "Exiting script..."
+    }
+}
+
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy $originalExecutionPolicy -Force

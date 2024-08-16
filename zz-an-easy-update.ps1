@@ -27,15 +27,25 @@ if (-Not (Test-Path $TEMP_EXTRACT_PATH)) {
     New-Item -ItemType Directory -Force -Path $TEMP_EXTRACT_PATH | Out-Null
 }
 
-param (
-    [string]$option = "Full"
-)
+# Display menu and get user input
+Write-Host "Select an option:"
+Write-Host "1. Full Update (Delete and replace all folders and files)"
+Write-Host "2. Mods only (Delete and replace only the mods folder)"
+$choice = Read-Host "Enter your choice (1 or 2)"
 
-# Paths
-$MINECRAFT_FOLDER = "$env:APPDATA\.minecraft"
-$TEMP_EXTRACT_PATH = "$env:TEMP\minecraft_temp_extract"
-$DOWNLOAD_FILE = "$env:TEMP\.minecraft.zip"
-$COOKIES_PATH = "$env:USERPROFILE\.cache\gdown\cookies.txt"
+# Process user input
+switch ($choice) {
+    "1" {
+        $option = "Full"
+    }
+    "2" {
+        $option = "Mods only"
+    }
+    default {
+        Write-Host "Invalid choice, exiting script."
+        exit
+    }
+}
 
 # Function to download files using gdown with cookies.txt
 function Download-File {

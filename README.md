@@ -1,3 +1,6 @@
+## Demonstration
+
+![Project Demo](an-easy-updater.gif)
 
 # an-easy-suite
 Automated update/zip packaging scripts for a server. Turns hours of packaging, uploading, and managing files into a '1-click' solution.

@@ -151,7 +151,7 @@ Remove-Item $DOWNLOAD_FILE
 Remove-Item -Recurse -Force $TEMP_EXTRACT_PATH
 
 Write-Host "Process completed successfully."
-Clear-Host
+# Clear-Host
 
 Write-Host "        _____"
 Write-Host "    ,-:' \;',''-, "

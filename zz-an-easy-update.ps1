@@ -66,8 +66,15 @@ function Download-File {
             throw "Downloaded file is too small to be valid. Please check the permissions and the link."
         }
     } catch {
+        Write-Host "Download failed. Exiting script."
         exit 1
     }
+}
+
+# Download the .minecraft zip from Google Drive if it doesn't already exist
+if (-Not (Test-Path $DOWNLOAD_FILE)) {
+    Write-Host "Downloading .minecraft.zip from Google Drive..."
+    Download-File -url $GDRIVE_URL -output $DOWNLOAD_FILE
 }
 
 # Full process: delete all folders and files
@@ -91,31 +98,50 @@ if ($option -eq "Full") {
             Remove-Item -Force $filePath
         }
     }
+}
 
-    # Download the .minecraft zip from Google Drive
-    if (-Not (Test-Path $DOWNLOAD_FILE)) {
-        Download-File -url $GDRIVE_URL -output $DOWNLOAD_FILE
+# Mods only: delete and move the mods folder only
+if ($option -eq "Mods only") {
+    Write-Host "Running Mods only option..."
+
+    # Delete the local mods folder
+    $modsPath = "$MINECRAFT_FOLDER\mods"
+    if (Test-Path $modsPath) {
+        Remove-Item -Recurse -Force $modsPath
     }
+}
 
-    # Extract the downloaded archive using 7-Zip to a temporary location
-    $7zipPath = "C:\Program Files\7-Zip\7z.exe"
-    $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_FILE`" -o`"$TEMP_EXTRACT_PATH`" -y"
-    Invoke-Expression $extractCommand
+# Extract the downloaded archive using 7-Zip to a temporary location
+Write-Host "Extracting .minecraft.zip..."
+$7zipPath = "C:\Program Files\7-Zip\7z.exe"
+$extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_FILE`" -o`"$TEMP_EXTRACT_PATH`" -y"
+Invoke-Expression $extractCommand
 
-    # Move all folders to the .minecraft folder
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Extraction failed. Exiting script."
+    exit 1
+}
+
+# Move folders based on the chosen option
+if ($option -eq "Full") {
     $foldersToMove = @("mods", "shaderpacks", "resourcepacks", "journeymap", "config")
-    foreach ($folder in $foldersToMove) {
-        $dest = Join-Path -Path $MINECRAFT_FOLDER -ChildPath $folder
-        $sourceFolder = Join-Path -Path $TEMP_EXTRACT_PATH -ChildPath $folder
-        if (Test-Path $sourceFolder) {
-            if (Test-Path $dest) {
-                Remove-Item -Recurse -Force $dest
-            }
-            Move-Item -Path $sourceFolder -Destination $dest
-        }
-    }
+} elseif ($option -eq "Mods only") {
+    $foldersToMove = @("mods")
+}
 
-    # Move specific files to the .minecraft folder
+foreach ($folder in $foldersToMove) {
+    $dest = Join-Path -Path $MINECRAFT_FOLDER -ChildPath $folder
+    $sourceFolder = Join-Path -Path $TEMP_EXTRACT_PATH -ChildPath $folder
+    if (Test-Path $sourceFolder) {
+        if (Test-Path $dest) {
+            Remove-Item -Recurse -Force $dest
+        }
+        Move-Item -Path $sourceFolder -Destination $dest
+    }
+}
+
+# Move specific files to the .minecraft folder (Full option only)
+if ($option -eq "Full") {
     $filesToMove = @("options.txt", "optionsof.txt", "optionsshaders.txt", "servers.dat", "servers.dat_old")
     foreach ($file in $filesToMove) {
         $sourceFile = Join-Path -Path $TEMP_EXTRACT_PATH -ChildPath $file
@@ -125,32 +151,14 @@ if ($option -eq "Full") {
     }
 }
 
-# Mods only: delete and move the mods folder only
-elseif ($option -eq "Mods only") {
-    Write-Host "Running Mods only option..."
-
-    # Delete the local mods folder
-    $modsPath = "$MINECRAFT_FOLDER\mods"
-    if (Test-Path $modsPath) {
-        Remove-Item -Recurse -Force $modsPath
-    }
-
-    # Extract the downloaded archive using 7-Zip to a temporary location
-    $7zipPath = "C:\Program Files\7-Zip\7z.exe"
-    $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_FILE`" -o`"$TEMP_EXTRACT_PATH`" -y"
-    Invoke-Expression $extractCommand
-
-    # Move the mods folder only
-    $sourceFolder = Join-Path -Path $TEMP_EXTRACT_PATH -ChildPath "mods"
-    if (Test-Path $sourceFolder) {
-        Move-Item -Path $sourceFolder -Destination $modsPath
-    }
-}
-
 # Clean up the downloaded archive file and temporary extract folder
 Write-Host "Cleaning up..."
-Remove-Item $DOWNLOAD_FILE
-Remove-Item -Recurse -Force $TEMP_EXTRACT_PATH
+if (Test-Path $DOWNLOAD_FILE) {
+    Remove-Item $DOWNLOAD_FILE
+}
+if (Test-Path $TEMP_EXTRACT_PATH) {
+    Remove-Item -Recurse -Force $TEMP_EXTRACT_PATH
+}
 
 Write-Host "Process completed successfully."
 # Clear-Host

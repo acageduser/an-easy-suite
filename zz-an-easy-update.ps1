@@ -166,6 +166,12 @@ if (Test-Path $TEMP_EXTRACT_PATH) {
 }
 Clear-Host
 
+Write-Host "Update complete!!"
+Write-Host ""
+Write-Host "**IMPORTANT**"
+Write-Host " 1.  Use Minecraft Forge 1.20.1"
+Write-Host " 2.  Remember to allocate 8GB of RAM to the game before starting it!"
+Write-Host ""
 Write-Host "        _____"
 Write-Host "    ,-:' \;',''-, "
 Write-Host "  .'-;_,;  ':-;_,'."
@@ -177,20 +183,12 @@ Write-Host " \     | .'     '-'/"
 Write-Host "  '.   ;/        .'"
 Write-Host "    ''-._____."
 Write-Host ""
-
-
-Write-Host "Update complete!!"
-Write-Host ""
-Write-Host "**IMPORTANT**"
-Write-Host " 1.  Use Minecraft Forge 1.20.1"
-Write-Host " 2.  Remember to allocate 8GB of RAM to the game before starting it!"
-Write-Host ""
 Write-Host "Menu:"
 Write-Host " 1. Download Minecraft Forge 1.20.1 installer"
 Write-Host "OR"
 Write-Host "Press Enter to exit the script."
 
-$input = Read-Host "Enter your choice:  "
+$input = Read-Host "Enter your choice"
 
 switch ($input) {
     "1" {

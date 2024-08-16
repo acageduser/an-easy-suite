@@ -28,9 +28,9 @@ if (-Not (Test-Path $TEMP_EXTRACT_PATH)) {
 }
 
 # Display menu and get user input
-Write-Host "Select an option-:"
+Write-Host "Select an option:"
 Write-Host ""
-Write-Host "1. Full Update (Delete and replace all folders and files)"
+Write-Host "1. Full Update (Delete and replace all needed folders and files)"
 Write-Host "2. Mods only (Delete and replace only the mods folder)"
 Write-Host ""
 $choice = Read-Host "Enter your choice (1 or 2)"
@@ -70,12 +70,14 @@ function Download-File {
         exit 1
     }
 }
+Clear-Host
 
 # Download the .minecraft zip from Google Drive if it doesn't already exist
 if (-Not (Test-Path $DOWNLOAD_FILE)) {
     Write-Host "Downloading .minecraft.zip from Google Drive..."
     Download-File -url $GDRIVE_URL -output $DOWNLOAD_FILE
 }
+Clear-Host
 
 # Full process: delete all folders and files
 if ($option -eq "Full") {
@@ -99,6 +101,7 @@ if ($option -eq "Full") {
         }
     }
 }
+Clear-Host
 
 # Mods only: delete and move the mods folder only
 if ($option -eq "Mods only") {
@@ -110,6 +113,7 @@ if ($option -eq "Mods only") {
         Remove-Item -Recurse -Force $modsPath
     }
 }
+Clear-Host
 
 # Extract the downloaded archive using 7-Zip to a temporary location
 Write-Host "Extracting .minecraft.zip..."
@@ -121,6 +125,7 @@ if ($LASTEXITCODE -ne 0) {
     Write-Host "Extraction failed. Exiting script."
     exit 1
 }
+Clear-Host
 
 # Move folders based on the chosen option
 if ($option -eq "Full") {
@@ -159,9 +164,7 @@ if (Test-Path $DOWNLOAD_FILE) {
 if (Test-Path $TEMP_EXTRACT_PATH) {
     Remove-Item -Recurse -Force $TEMP_EXTRACT_PATH
 }
-
-Write-Host "Process completed successfully."
-# Clear-Host
+Clear-Host
 
 Write-Host "        _____"
 Write-Host "    ,-:' \;',''-, "
@@ -178,21 +181,6 @@ Write-Host ""
 
 Write-Host "Update complete!!"
 Write-Host ""
-Write-Host "Folders Updated:"
-Write-Host "	- config"
-Write-Host "	- mods"
-Write-Host "	- shaderpacks"
-Write-Host "	- resourcepacks"
-Write-Host "	- journeymap"
-Write-Host ""
-Write-Host "Files Updated:"
-Write-Host "	- options.txt"
-Write-Host "	- optionsof.txt"
-Write-Host "	- optionsshaders.txt"
-Write-Host "	- servers.dat"
-Write-Host "	- servers.dat_old"
-Write-Host ""
-Write-Host "World IP Address: 51.79.77.46:25600"
 Write-Host "Use Minecraft 1.20.1 v47.3.0 | https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html"
 Write-Host ""
 Write-Host "Remember to allocate 8GB of ram to the game before starting it!"

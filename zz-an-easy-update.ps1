@@ -182,11 +182,12 @@ Write-Host ""
 Write-Host "Update complete!!"
 Write-Host ""
 Write-Host "**IMPORTANT**"
-Write-Host " 1.  Use Minecraft 1.20.1 v47.3.0 (Recommended Installer)"
+Write-Host " 1.  Use Minecraft Forge 1.20.1"
 Write-Host " 2.  Remember to allocate 8GB of RAM to the game before starting it!"
 Write-Host ""
 Write-Host "Menu:"
-Write-Host " 1. Open the Minecraft 1.20.1 v47.3.0 in Google Chrome"
+Write-Host " 1. Download Minecraft Forge 1.20.1 installer"
+Write-Host "OR"
 Write-Host "Press Enter to exit the script."
 
 $input = Read-Host "Enter your choice:  "
@@ -194,7 +195,7 @@ $input = Read-Host "Enter your choice:  "
 switch ($input) {
     "1" {
         Write-Host "Opening the link in Google Chrome..."
-        Start-Process "chrome.exe" "https://files.minecraftforge.net/net/minecraftforge/forge/index_1.20.1.html"
+        Start-Process "chrome.exe" "https://maven.minecraftforge.net/net/minecraftforge/forge/1.20.1-47.3.0/forge-1.20.1-47.3.0-installer.jar"
     }
     default {
         Write-Host "Exiting script..."

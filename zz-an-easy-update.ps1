@@ -4,9 +4,10 @@ Clear-Host
 Write-Host "Before running this script:"
 Write-Host "    1.  Close Minecraft."
 Write-Host "    2.  Verify that the following are installed on your PC:"
-Write-Host "         - Python"
-Write-Host "         - PIP"
-Write-Host "         - 7-zip"
+Write-Host "         - Python (python.org/downloads)"
+Write-Host "         - PIP (curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py)"
+Write-Host "         - 7-zip (7-zip.org)"
+Write-Host "         - gdown (pip install gdown)"
 Write-Host ""
 
 # Execution policy change

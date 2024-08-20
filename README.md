@@ -1,3 +1,12 @@
+## Demonstration
+
+```an-easy-updater.bat```
+![Project Demo](an-easy-updater.gif)
+- Click ```an-easy-updater.bat``` to get all the needed files.
+
+```an-easy-zipper.bat```
+![Project Demo](an-easy-zipper.gif)
+- Click ```an-easy-zipper.bat``` to zip and upload all the needed files.
 
 # an-easy-suite
 Automated update/zip packaging scripts for a server. Turns hours of packaging, uploading, and managing files into a '1-click' solution.

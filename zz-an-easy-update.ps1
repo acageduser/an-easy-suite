@@ -18,9 +18,10 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned -Force
 $GDRIVE_URL = "https://drive.google.com/uc?export=download&id=19Y9HV7bJdSt2VyyVUUXkujZTfbDbtrbD"
 
 # Paths
-$MINECRAFT_FOLDER = "$env:APPDATA\.minecraft"
-$TEMP_EXTRACT_PATH = "$env:TEMP\minecraft_temp_extract"
-$DOWNLOAD_FILE = "$env:TEMP\.minecraft.zip"
+$scriptDirectory = (Get-Location).Path
+$MINECRAFT_FOLDER = "$scriptDirectory\.minecraft"
+$TEMP_EXTRACT_PATH = "$scriptDirectory\minecraft_temp_extract"
+$DOWNLOAD_FILE = "$scriptDirectory\.minecraft.zip"
 $COOKIES_PATH = "$env:USERPROFILE\.cache\gdown\cookies.txt"
 
 # Ensure the temporary extract path exists

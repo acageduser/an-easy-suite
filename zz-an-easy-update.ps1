@@ -1,5 +1,5 @@
 # zz-an-easy-update.ps1
-Clear-Host
+# Clear-Host
 
 Write-Host "Before running this script:"
 Write-Host "    1.  Close Minecraft."
@@ -129,6 +129,10 @@ if ($LASTEXITCODE -ne 0) {
 }
 # Clear-Host
 
+# Debugging: Check extracted directories
+Write-Host "Verifying extracted directories..."
+Get-ChildItem -Path $TEMP_EXTRACT_PATH -Force
+
 # Move folders based on the chosen option
 if ($option -eq "Full") {
     $foldersToMove = @("mods", "shaderpacks", "resourcepacks", "journeymap", "config")
@@ -143,7 +147,9 @@ foreach ($folder in $foldersToMove) {
         if (Test-Path $dest) {
             Remove-Item -Recurse -Force $dest
         }
-        Move-Item -Path $sourceFolder -Destination $dest
+        Move-Item -Path $sourceFolder -Destination $dest -Force
+    } else {
+        Write-Host "Warning: Source folder '$sourceFolder' not found. Skipping."
     }
 }
 
@@ -153,7 +159,9 @@ if ($option -eq "Full") {
     foreach ($file in $filesToMove) {
         $sourceFile = Join-Path -Path $TEMP_EXTRACT_PATH -ChildPath $file
         if (Test-Path $sourceFile) {
-            Move-Item -Path $sourceFile -Destination $MINECRAFT_FOLDER
+            Move-Item -Path $sourceFile -Destination $MINECRAFT_FOLDER -Force
+        } else {
+            Write-Host "Warning: Source file '$sourceFile' not found. Skipping."
         }
     }
 }

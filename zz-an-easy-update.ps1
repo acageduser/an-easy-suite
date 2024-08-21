@@ -166,7 +166,7 @@ if (Test-Path $DOWNLOAD_FILE) {
 if (Test-Path $TEMP_EXTRACT_PATH) {
     Remove-Item -Recurse -Force $TEMP_EXTRACT_PATH
 }
-Clear-Host
+# Clear-Host
 
 Write-Host "Update complete!!"
 Write-Host ""

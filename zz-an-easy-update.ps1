@@ -31,7 +31,7 @@ if (-Not (Test-Path $TEMP_EXTRACT_PATH)) {
 # Display menu and get user input
 Write-Host "Select an option:"
 Write-Host ""
-Write-Host "1. Full Update (Delete and replace all needed folders and files)"
+Write-Host "1. (*Recommended) Full Update (Delete and replace all needed folders and files)"
 Write-Host "2. Mods only (Delete and replace only the mods folder)"
 Write-Host ""
 $choice = Read-Host "Enter your choice (1 or 2)"

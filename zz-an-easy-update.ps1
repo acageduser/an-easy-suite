@@ -72,14 +72,14 @@ function Download-File {
         exit 1
     }
 }
-Clear-Host
+# Clear-Host
 
 # Download the .minecraft zip from Google Drive if it doesn't already exist
 if (-Not (Test-Path $DOWNLOAD_FILE)) {
     Write-Host "Downloading .minecraft.zip from Google Drive..."
     Download-File -url $GDRIVE_URL -output $DOWNLOAD_FILE
 }
-Clear-Host
+# Clear-Host
 
 # Full process: delete all folders and files
 if ($option -eq "Full") {
@@ -103,7 +103,7 @@ if ($option -eq "Full") {
         }
     }
 }
-Clear-Host
+# Clear-Host
 
 # Mods only: delete and move the mods folder only
 if ($option -eq "Mods only") {
@@ -115,7 +115,7 @@ if ($option -eq "Mods only") {
         Remove-Item -Recurse -Force $modsPath
     }
 }
-Clear-Host
+# Clear-Host
 
 # Extract the downloaded archive using 7-Zip to a temporary location
 Write-Host "Extracting .minecraft.zip..."
@@ -127,7 +127,7 @@ if ($LASTEXITCODE -ne 0) {
     Write-Host "Extraction failed. Exiting script."
     exit 1
 }
-Clear-Host
+# Clear-Host
 
 # Move folders based on the chosen option
 if ($option -eq "Full") {

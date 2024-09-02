@@ -43,6 +43,8 @@ echo Uploading .minecraft.zip to Google Drive...
 %RCLONE_EXEC% copy "%OUTPUT_ZIP%" %REMOTE_NAME%:%REMOTE_PATH% --drive-chunk-size 64M --progress
 if errorlevel 1 (
     echo Upload failed. Please check the remote configuration and try again.
+    pause
+    exit /b 1
 ) else (
     echo Upload successful. The old .minecraft.zip file has been replaced.
 )

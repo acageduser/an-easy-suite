@@ -1,16 +1,16 @@
 Script Overview (zz-an-easy-update.ps1)
 
 This script performs updates for a Minecraft installation, offering two modes: "Full Update" and "Mods Only." 
-It automates the process of downloading, extracting, replacing, and cleaning up necessary files.
+It automates the process of downloading, extracting, replacing, and cleaning up necessary files. 
+The script now defaults to always replacing files without prompting the user during the extraction process.
 
 ------------------------------------------------------------------------------------------------
 
 Features:
 
-1. User Input Menu:
-   - Displays a menu to the user, prompting them to choose between two update options:
-     - Option 1: Full Update
-     - Option 2: Mods Only
+1. Automatic File Replacement:
+   - The script is configured to always overwrite existing files during the extraction process, ensuring no prompts 
+     for user confirmation when replacing files.
 
 2. Download the Minecraft Archive:
    - Downloads a .minecraft.zip file from a Google Drive link using gdown.
@@ -18,7 +18,7 @@ Features:
 
 3. Cleanup:
    - Removes the downloaded .minecraft.zip file and the temporary extraction folder after the update process, 
-     based on the user's choice from the menu.
+     once the user exits the script.
 
 ------------------------------------------------------------------------------------------------
 
@@ -26,8 +26,8 @@ Update Options:
 
 1. Full Update:
    - Step 1: Deletes the existing mods folder located in the same directory as the script.
-   - Step 2: Extracts the downloaded .minecraft.zip file using 7-Zip. The extraction occurs in the same directory where 
-             the script is run (the "extract here" option), and the extracted contents overwrite any existing files.
+   - Step 2: Extracts the downloaded .minecraft.zip file using 7-Zip. The extraction occurs in the same directory 
+             where the script is run (the "extract here" option), and the extracted contents overwrite any existing files.
    - Step 3: All files and folders inside .minecraft.zip replace their old counterparts.
    - Step 4: Cleanup happens after the user exits the script (deletes the downloaded .minecraft.zip file).
 

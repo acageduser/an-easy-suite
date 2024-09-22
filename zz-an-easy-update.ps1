@@ -18,7 +18,7 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned -Force
 $GDRIVE_URL = "https://drive.google.com/uc?export=download&id=19Y9HV7bJdSt2VyyVUUXkujZTfbDbtrbD"
 
 # Paths
-$scriptDirectory = (Get-Location).Path
+$scriptDirectory = $PSScriptRoot  # Directory where the script is run
 $MINECRAFT_FOLDER = "$scriptDirectory\.minecraft"
 $TEMP_EXTRACT_PATH = "$scriptDirectory\minecraft_temp_extract"
 $DOWNLOAD_FILE = "$scriptDirectory\.minecraft.zip"
@@ -135,7 +135,7 @@ if ($option -eq "Mods only") {
     }
 }
 
-# Extract the downloaded archive using 7-Zip to a temporary location
+# Extract the downloaded archive using 7-Zip to the script's directory
 Write-Host "Extracting .minecraft.zip..."
 $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_FILE`" -o`"$TEMP_EXTRACT_PATH`" -y"
 Invoke-Expression $extractCommand

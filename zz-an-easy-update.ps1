@@ -147,18 +147,6 @@ if ($option -eq "Full") {
     } else {
         Write-Host "Mods folder not found in extracted files."
     }
-
-    # Clean up the temporary extraction folder
-    if (Test-Path $tempExtractPath) {
-        Write-Host "Cleaning up temporary extraction folder..."
-        Remove-Item -Recurse -Force $tempExtractPath
-    }
-}
-
-# Clean up the downloaded .minecraft.zip file if desired
-if (Test-Path $DOWNLOAD_FILE) {
-    Write-Host "Cleaning up downloaded .minecraft.zip file..."
-    Remove-Item -Force $DOWNLOAD_FILE
 }
 
 Write-Host "Update complete!!"
@@ -168,8 +156,8 @@ Write-Host " 1.  Use Minecraft Forge 1.20.1"
 Write-Host " 2.  Remember to allocate 8GB of RAM to the game before starting it!"
 Write-Host ""
 Write-Host "        _____"
-Write-Host "    ,-:' \;',''-, "
-Write-Host "  .'-;_,;  ':-;_,'."
+Write-Host "    ,-:' \;',''-,"
+Write-Host "  .'-;_,;  ':-;_,'"
 Write-Host " /;   '/    ,  _'.-\"
 Write-Host "| ''. ('     /' ' \'|"
 Write-Host "|:.  '\'-.   \_   / |"
@@ -192,6 +180,18 @@ switch ($input) {
     }
     default {
         Write-Host "Exiting script..."
+        
+        # Clean up the temporary extraction folder
+        if (Test-Path $tempExtractPath) {
+            Write-Host "Cleaning up temporary extraction folder..."
+            Remove-Item -Recurse -Force $tempExtractPath
+        }
+
+        # Clean up the downloaded .minecraft.zip file if desired
+        if (Test-Path $DOWNLOAD_FILE) {
+            Write-Host "Cleaning up downloaded .minecraft.zip file..."
+            Remove-Item -Force $DOWNLOAD_FILE
+        }
     }
 }
 

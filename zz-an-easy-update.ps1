@@ -30,7 +30,7 @@ if (-Not (Test-Path $TEMP_EXTRACT_PATH)) {
 }
 
 # Display menu and get user input
-Write-Host "Select an option:"
+Write-Host "Select an option :"
 Write-Host ""
 Write-Host "1. (*Recommended) Full Update (Delete and replace all needed folders and files)"
 Write-Host "2. Mods only (Delete and replace only the mods folder)"
@@ -184,16 +184,13 @@ foreach ($folder in $foldersToMove) {
 }
 
 # Move specific files to the .minecraft folder (Full option only)
-if ($option -eq "Full") {
-    $filesToMove = @("options.txt", "optionsof.txt", "optionsshaders.txt", "servers.dat", "servers.dat_old")
-    foreach ($file in $filesToMove) {
-        $sourceFile = Join-Path -Path $TEMP_EXTRACT_PATH -ChildPath $file
-        if (Test-Path $sourceFile) {
-            Move-Item -Path $sourceFile -Destination $MINECRAFT_FOLDER -Force
-        } else {
-            Write-Host "Warning: Source file '$sourceFile' not found. Skipping."
-        }
-    }
+# Keeping the .minecraft.zip file and the minecraft_temp_extract folder
+Write-Host "Skipping cleanup of the downloaded zip and extraction folder..."
+try {
+    # No cleanup here since we want to keep both .minecraft.zip and minecraft_temp_extract
+    # If any logging or post-processing needs to happen, you can add it here
+} catch {
+    Write-Host "Error during cleanup: $_"
 }
 
 # Clean up the downloaded archive file and temporary extract folder

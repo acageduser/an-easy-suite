@@ -109,9 +109,17 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
-# Debugging: Check extracted directories
+# Verifying extracted directories for nested paths and adjusting if needed
 Write-Host "Verifying extracted directories..."
-Get-ChildItem -Path $TEMP_EXTRACT_PATH -Force
+$nestedFolder = Get-ChildItem -Path $TEMP_EXTRACT_PATH | Where-Object { $_.PSIsContainer } | Select-Object -First 1
+
+# Adjust the $TEMP_EXTRACT_PATH if there's a nested directory
+if ($nestedFolder -and (Test-Path "$TEMP_EXTRACT_PATH\$($nestedFolder.Name)\mods")) {
+    Write-Host "Nested directory found: $($nestedFolder.Name)"
+    $TEMP_EXTRACT_PATH = "$TEMP_EXTRACT_PATH\$($nestedFolder.Name)"
+} else {
+    Write-Host "No nested directory found."
+}
 
 # Copy folders based on the chosen option instead of moving them
 if ($option -eq "Full") {
@@ -123,9 +131,11 @@ if ($option -eq "Full") {
 foreach ($folder in $foldersToCopy) {
     $dest = Join-Path -Path $MINECRAFT_FOLDER -ChildPath $folder
     $sourceFolder = Join-Path -Path $TEMP_EXTRACT_PATH -ChildPath $folder
+    
     if (Test-Path $sourceFolder) {
         try {
-            Copy-Item -Path $sourceFolder -Destination $dest -Recurse -Force  # Copy files and overwrite existing ones
+            Write-Host "Copying $folder..."
+            Copy-Item -Path $sourceFolder\* -Destination $dest -Recurse -Force  # Copy contents without nesting paths
         } catch {
             Write-Host "Error copying ${folder}: $_"
         }
@@ -140,7 +150,8 @@ if ($option -eq "Full") {
     foreach ($file in $filesToCopy) {
         $sourceFile = Join-Path -Path $TEMP_EXTRACT_PATH -ChildPath $file
         if (Test-Path $sourceFile) {
-            Copy-Item -Path $sourceFile -Destination $MINECRAFT_FOLDER -Force  # Copy files and overwrite existing ones
+            Write-Host "Copying $file..."
+            Copy-Item -Path $sourceFile -Destination $MINECRAFT_FOLDER -Force  # Copy files without moving
         } else {
             Write-Host "Warning: Source file '$sourceFile' not found. Skipping."
         }

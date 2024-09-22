@@ -1,7 +1,7 @@
 # zz-an-easy-update.ps1
 Clear-Host
 
-Write-Host "Before running this script:"
+Write-Host "Before running this script :"
 Write-Host "    a.  Close Minecraft."
 Write-Host "    b.  Verify that the following are installed on your PC:"
 Write-Host "         - Python (python.org/downloads)"
@@ -30,7 +30,7 @@ if (-Not (Test-Path $TEMP_EXTRACT_PATH)) {
 }
 
 # Display menu and get user input
-Write-Host "Select an option:"
+Write-Host "Select an option :"
 Write-Host ""
 Write-Host "1. (*Recommended) Full Update (Copy and replace needed folders and files)"
 Write-Host "2. Mods only (Copy and replace only the mods folder)"
@@ -129,13 +129,18 @@ if ($option -eq "Full") {
 }
 
 foreach ($folder in $foldersToCopy) {
+foreach ($folder in $foldersToCopy) {
     $dest = Join-Path -Path $MINECRAFT_FOLDER -ChildPath $folder
     $sourceFolder = Join-Path -Path $TEMP_EXTRACT_PATH -ChildPath $folder
     
     if (Test-Path $sourceFolder) {
         try {
             Write-Host "Copying $folder..."
-            Copy-Item -Path $sourceFolder\* -Destination $dest -Recurse -Force  # Copy contents without nesting paths
+            # Remove the extra \.minecraft if it exists in the path
+            if (!(Test-Path $dest)) {
+                New-Item -Path $dest -ItemType Directory -Force
+            }
+            Copy-Item -Path $sourceFolder\* -Destination $dest -Recurse -Force
         } catch {
             Write-Host "Error copying ${folder}: $_"
         }
@@ -151,7 +156,7 @@ if ($option -eq "Full") {
         $sourceFile = Join-Path -Path $TEMP_EXTRACT_PATH -ChildPath $file
         if (Test-Path $sourceFile) {
             Write-Host "Copying $file..."
-            Copy-Item -Path $sourceFile -Destination $MINECRAFT_FOLDER -Force  # Copy files without moving
+            Copy-Item -Path $sourceFile -Destination $MINECRAFT_FOLDER -Force
         } else {
             Write-Host "Warning: Source file '$sourceFile' not found. Skipping."
         }

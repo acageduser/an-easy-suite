@@ -1,0 +1,63 @@
+Script Overview (zz-an-easy-update.ps1)
+
+This script performs updates for a Minecraft installation, offering two modes: "Full Update" and "Mods Only." 
+It automates the process of downloading, extracting, and replacing necessary files.
+
+------------------------------------------------------------------------------------------------
+
+Features:
+
+1. User Input Menu:
+   - Displays a menu to the user, prompting them to choose between two update options:
+     - Option 1: Full Update
+     - Option 2: Mods Only
+
+2. Download the Minecraft Archive:
+   - Downloads a .minecraft.zip file from a Google Drive link using gdown.
+   - The file is placed in the same directory where the script is executed.
+
+------------------------------------------------------------------------------------------------
+
+Update Options:
+
+1. Full Update:
+   - Step 1: Deletes the existing mods folder located in the same directory as the script.
+   - Step 2: Extracts the downloaded .minecraft.zip file using 7-Zip. The extraction occurs in the same directory where 
+             the script is run (the "extract here" option), and the extracted contents overwrite any existing files.
+   - Step 3: All files and folders inside .minecraft.zip replace their old counterparts.
+
+2. Mods Only:
+   - Step 1: Deletes the existing mods folder located in the same directory as the script.
+   - Step 2: Creates a temporary folder called minecraft_temp_extract.
+   - Step 3: Extracts the contents of the .minecraft.zip archive into the minecraft_temp_extract folder using 7-Zip.
+   - Step 4: Copies only the contents of the mods folder from minecraft_temp_extract back to the main directory 
+             (one level above where the script is run).
+
+------------------------------------------------------------------------------------------------
+
+Requirements:
+
+Before running the script, ensure the following dependencies are installed:
+   - Python: Download from https://www.python.org/downloads/.
+   - PIP: Install via the following command:
+     curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+   - 7-Zip: Download from https://www.7-zip.org.
+   - gdown: Install with the following PIP command:
+     pip install gdown
+
+------------------------------------------------------------------------------------------------
+
+File Structure:
+
+Main Directory (Where the script runs):
+├── an-easy-update.bat        # The file the user will run
+├── zz-an-easy-update.ps1     # The PowerShell script file
+├── .minecraft.zip            # Downloaded .minecraft archive (if it exists)
+├── mods/                     # Minecraft mods folder (will be deleted/replaced)
+├── shaderpacks/              # Minecraft shaderpacks folder (optional for full update)
+├── resourcepacks/            # Minecraft resourcepacks folder (optional for full update)
+├── journeymap/               # Minecraft journeymap folder (optional for full update)
+├── config/                   # Minecraft config folder (optional for full update)
+├── minecraft_temp_extract/   # Temporary folder for extracting files (used in Mods Only mode)
+
+*note: The script runs in the 

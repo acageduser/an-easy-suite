@@ -129,17 +129,16 @@ if ($option -eq "Full") {
 }
 
 foreach ($folder in $foldersToCopy) {
+    # Corrected: Join the destination path without the extra ".minecraft"
     $dest = Join-Path -Path $MINECRAFT_FOLDER -ChildPath $folder
     $sourceFolder = Join-Path -Path $TEMP_EXTRACT_PATH -ChildPath $folder
-    
     if (Test-Path $sourceFolder) {
+        if (-not (Test-Path $dest)) {
+            New-Item -Path $dest -ItemType Directory -Force
+        }
         try {
             Write-Host "Copying $folder..."
-            # Remove the extra \.minecraft if it exists in the path
-            if (!(Test-Path $dest)) {
-                New-Item -Path $dest -ItemType Directory -Force
-            }
-            Copy-Item -Path $sourceFolder\* -Destination $dest -Recurse -Force
+            Copy-Item -Path "$sourceFolder\*" -Destination $dest -Recurse -Force  # Ensure copy works for contents
         } catch {
             Write-Host "Error copying ${folder}: $_"
         }

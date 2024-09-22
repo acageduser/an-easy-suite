@@ -32,8 +32,8 @@ if (-Not (Test-Path $TEMP_EXTRACT_PATH)) {
 # Display menu and get user input
 Write-Host "Select an option :"
 Write-Host ""
-Write-Host "1. (*Recommended) Full Update (Delete and replace all needed folders and files)"
-Write-Host "2. Mods only (Delete and replace only the mods folder)"
+Write-Host "1. (*Recommended) Full Update (Copy and replace needed folders and files)"
+Write-Host "2. Mods only (Copy and replace only the mods folder)"
 Write-Host ""
 $choice = Read-Host "Enter your choice (1 or 2)"
 
@@ -99,40 +99,6 @@ if (-Not $7zipPath) {
     exit 1
 }
 
-# Full process: delete all folders and files
-if ($option -eq "Full") {
-    Write-Host "Running Full option..."
-
-    # Delete the local mods, shaderpacks, resourcepacks, journeymap, and config folders
-    $foldersToDelete = @("mods", "shaderpacks", "resourcepacks", "journeymap", "config")
-    foreach ($folder in $foldersToDelete) {
-        $folderPath = "$MINECRAFT_FOLDER\$folder"
-        if (Test-Path $folderPath) {
-            Remove-Item -Recurse -Force $folderPath
-        }
-    }
-
-    # Delete the specific files before extracting the new ones
-    $filesToDelete = @("options.txt", "optionsof.txt", "optionsshaders.txt", "servers.dat", "servers.dat_old")
-    foreach ($file in $filesToDelete) {
-        $filePath = "$MINECRAFT_FOLDER\$file"
-        if (Test-Path $filePath) {
-            Remove-Item -Force $filePath
-        }
-    }
-}
-
-# Mods only: delete and move the mods folder only
-if ($option -eq "Mods only") {
-    Write-Host "Running Mods only option..."
-
-    # Delete the local mods folder
-    $modsPath = "$MINECRAFT_FOLDER\mods"
-    if (Test-Path $modsPath) {
-        Remove-Item -Recurse -Force $modsPath
-    }
-}
-
 # Extract the downloaded archive using 7-Zip to the script's directory
 Write-Host "Extracting .minecraft.zip..."
 $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_FILE`" -o`"$TEMP_EXTRACT_PATH`" -y"
@@ -149,20 +115,17 @@ Get-ChildItem -Path $TEMP_EXTRACT_PATH -Force
 
 # Copy folders based on the chosen option instead of moving them
 if ($option -eq "Full") {
-    $foldersToMove = @("mods", "shaderpacks", "resourcepacks", "journeymap", "config")
+    $foldersToCopy = @("mods", "shaderpacks", "resourcepacks", "journeymap", "config")
 } elseif ($option -eq "Mods only") {
-    $foldersToMove = @("mods")
+    $foldersToCopy = @("mods")
 }
 
-foreach ($folder in $foldersToMove) {
+foreach ($folder in $foldersToCopy) {
     $dest = Join-Path -Path $MINECRAFT_FOLDER -ChildPath $folder
     $sourceFolder = Join-Path -Path $TEMP_EXTRACT_PATH -ChildPath $folder
     if (Test-Path $sourceFolder) {
-        if (Test-Path $dest) {
-            Remove-Item -Recurse -Force $dest  # Remove the existing folder to avoid conflicts
-        }
         try {
-            Copy-Item -Path $sourceFolder -Destination $dest -Recurse -Force  # Copy instead of move
+            Copy-Item -Path $sourceFolder -Destination $dest -Recurse -Force  # Copy files and overwrite existing ones
         } catch {
             Write-Host "Error copying ${folder}: $_"
         }
@@ -177,7 +140,7 @@ if ($option -eq "Full") {
     foreach ($file in $filesToCopy) {
         $sourceFile = Join-Path -Path $TEMP_EXTRACT_PATH -ChildPath $file
         if (Test-Path $sourceFile) {
-            Copy-Item -Path $sourceFile -Destination $MINECRAFT_FOLDER -Force  # Copy instead of move
+            Copy-Item -Path $sourceFile -Destination $MINECRAFT_FOLDER -Force  # Copy files and overwrite existing ones
         } else {
             Write-Host "Warning: Source file '$sourceFile' not found. Skipping."
         }

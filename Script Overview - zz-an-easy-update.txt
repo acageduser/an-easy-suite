@@ -1,44 +1,32 @@
 Script Overview (zz-an-easy-update.ps1)
 
-This script performs updates for a Minecraft installation, offering two modes: "Full Update" and "Mods Only." 
+This script performs updates for a Minecraft installation with a single "Full Update" option. 
 It automates the process of downloading, extracting, replacing, and cleaning up necessary files. 
-The script now defaults to always replacing files without prompting the user during the extraction process.
 
 ------------------------------------------------------------------------------------------------
 
 Features:
 
-1. Automatic File Replacement:
-   - The script is configured to always overwrite existing files during the extraction process, ensuring no prompts 
-     for user confirmation when replacing files.
+1. Full Update Mode:
+   - Automatically deletes the existing mods folder and replaces it with the contents from the latest .minecraft.zip file.
+   - Overwrites existing files without prompting the user for confirmation.
 
 2. Download the Minecraft Archive:
    - Downloads a .minecraft.zip file from a Google Drive link using gdown.
    - The file is placed in the same directory where the script is executed.
 
 3. Cleanup:
-   - Removes the downloaded .minecraft.zip file and the temporary extraction folder after the update process, 
-     once the user exits the script.
+   - Removes the downloaded .minecraft.zip file after the update process, only when the user exits the script by pressing Enter.
 
 ------------------------------------------------------------------------------------------------
 
-Update Options:
+Update Process:
 
 1. Full Update:
    - Step 1: Deletes the existing mods folder located in the same directory as the script.
-   - Step 2: Extracts the downloaded .minecraft.zip file using 7-Zip. The extraction occurs in the same directory 
-             where the script is run (the "extract here" option), and the extracted contents overwrite any existing files.
-   - Step 3: All files and folders inside .minecraft.zip replace their old counterparts.
-   - Step 4: Cleanup happens after the user exits the script (deletes the downloaded .minecraft.zip file).
-
-2. Mods Only:
-   - Step 1: Deletes the existing mods folder located in the same directory as the script.
-   - Step 2: Creates a temporary folder called minecraft_temp_extract.
-   - Step 3: Extracts the contents of the .minecraft.zip archive into the minecraft_temp_extract folder using 7-Zip.
-   - Step 4: Copies only the contents of the mods folder from minecraft_temp_extract back to the main directory 
-             (one level above where the script is run).
-   - Step 5: Cleanup happens after the user exits the script (deletes the minecraft_temp_extract folder and 
-             the downloaded .minecraft.zip file).
+   - Step 2: Extracts the downloaded .minecraft.zip file using 7-Zip. The extraction occurs in the same directory where 
+             the script is run (the "extract here" option), and the extracted contents overwrite any existing files.
+   - Step 3: Cleans up by deleting the .minecraft.zip file after the user exits the script.
 
 ------------------------------------------------------------------------------------------------
 
@@ -65,6 +53,5 @@ Main Directory (Where the script runs):
 ├── resourcepacks/            # Minecraft resourcepacks folder (optional for full update)
 ├── journeymap/               # Minecraft journeymap folder (optional for full update)
 ├── config/                   # Minecraft config folder (optional for full update)
-├── minecraft_temp_extract/   # Temporary folder for extracting files (used in Mods Only mode, deleted afterward)
 
 *note: The script runs in the directory where the zz-an-easy-update.ps1 file is executed.

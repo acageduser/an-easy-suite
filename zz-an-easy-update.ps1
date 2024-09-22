@@ -1,7 +1,7 @@
 # zz-an-easy-update.ps1
 Clear-Host
 
-Write-Host "Before running this script :"
+Write-Host "Before running this script:"
 Write-Host "    a.  Close Minecraft."
 Write-Host "    b.  Verify that the following are installed on your PC:"
 Write-Host "         - Python (python.org/downloads)"
@@ -30,7 +30,7 @@ if (-Not (Test-Path $TEMP_EXTRACT_PATH)) {
 }
 
 # Display menu and get user input
-Write-Host "Select an option :"
+Write-Host "Select an option:"
 Write-Host ""
 Write-Host "1. (*Recommended) Full Update (Copy and replace needed folders and files)"
 Write-Host "2. Mods only (Copy and replace only the mods folder)"

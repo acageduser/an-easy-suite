@@ -129,7 +129,6 @@ if ($option -eq "Full") {
 }
 
 foreach ($folder in $foldersToCopy) {
-foreach ($folder in $foldersToCopy) {
     $dest = Join-Path -Path $MINECRAFT_FOLDER -ChildPath $folder
     $sourceFolder = Join-Path -Path $TEMP_EXTRACT_PATH -ChildPath $folder
     

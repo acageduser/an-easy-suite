@@ -143,23 +143,11 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
-# Checking for nested directories after extraction
-Write-Host "Checking for nested directories..."
-$nestedFolder = Get-ChildItem -Path $TEMP_EXTRACT_PATH | Where-Object { $_.PSIsContainer } | Select-Object -First 1
-
-# If a nested folder exists, adjust the $TEMP_EXTRACT_PATH to point inside it
-if ($nestedFolder -and (Test-Path "$TEMP_EXTRACT_PATH\$($nestedFolder.Name)\mods")) {
-    Write-Host "Nested directory found: $($nestedFolder.Name)"
-    $TEMP_EXTRACT_PATH = "$TEMP_EXTRACT_PATH\$($nestedFolder.Name)"
-} else {
-    Write-Host "No nested directory found."
-}
-
 # Debugging: Check extracted directories
 Write-Host "Verifying extracted directories..."
 Get-ChildItem -Path $TEMP_EXTRACT_PATH -Force
 
-# Move folders based on the chosen option
+# Copy folders based on the chosen option instead of moving them
 if ($option -eq "Full") {
     $foldersToMove = @("mods", "shaderpacks", "resourcepacks", "journeymap", "config")
 } elseif ($option -eq "Mods only") {
@@ -171,37 +159,35 @@ foreach ($folder in $foldersToMove) {
     $sourceFolder = Join-Path -Path $TEMP_EXTRACT_PATH -ChildPath $folder
     if (Test-Path $sourceFolder) {
         if (Test-Path $dest) {
-            Remove-Item -Recurse -Force $dest
+            Remove-Item -Recurse -Force $dest  # Remove the existing folder to avoid conflicts
         }
         try {
-            Move-Item -Path $sourceFolder -Destination $dest -Force
+            Copy-Item -Path $sourceFolder -Destination $dest -Recurse -Force  # Copy instead of move
         } catch {
-            Write-Host "Error moving ${folder}: $_"
+            Write-Host "Error copying ${folder}: $_"
         }
     } else {
         Write-Host "Warning: Source folder '$sourceFolder' not found. Skipping."
     }
 }
 
-# Move specific files to the .minecraft folder (Full option only)
+# Copy specific files to the .minecraft folder (Full option only)
 if ($option -eq "Full") {
-    $filesToMove = @("options.txt", "optionsof.txt", "optionsshaders.txt", "servers.dat", "servers.dat_old")
-    foreach ($file in $filesToMove) {
+    $filesToCopy = @("options.txt", "optionsof.txt", "optionsshaders.txt", "servers.dat", "servers.dat_old")
+    foreach ($file in $filesToCopy) {
         $sourceFile = Join-Path -Path $TEMP_EXTRACT_PATH -ChildPath $file
         if (Test-Path $sourceFile) {
-            Move-Item -Path $sourceFile -Destination $MINECRAFT_FOLDER -Force
+            Copy-Item -Path $sourceFile -Destination $MINECRAFT_FOLDER -Force  # Copy instead of move
         } else {
             Write-Host "Warning: Source file '$sourceFile' not found. Skipping."
         }
     }
 }
 
-# Clean up the downloaded archive file and temporary extract folder
-# Keeping the .minecraft.zip file and the minecraft_temp_extract folder
+# Skip cleanup of the downloaded archive file and temporary extract folder
 Write-Host "Skipping cleanup of the downloaded zip and extraction folder..."
 try {
     # No cleanup here since we want to keep both .minecraft.zip and minecraft_temp_extract
-    # If any logging or post-processing needs to happen, you can add it here
 } catch {
     Write-Host "Error during cleanup: $_"
 }

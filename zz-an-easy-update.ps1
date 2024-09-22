@@ -109,7 +109,6 @@ Write-Host "|     (   ',  .'\ ;'|"
 Write-Host " \     | .'     '-'/"
 Write-Host "  '.   ;/        .'"
 Write-Host "    ''-._____."
-
 Write-Host ""
 Write-Host "Menu:"
 Write-Host " 1. Download Minecraft Forge 1.20.1 installer"

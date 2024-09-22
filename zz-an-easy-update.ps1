@@ -24,27 +24,8 @@ $COOKIES_PATH = "$env:USERPROFILE\.cache\gdown\cookies.txt"
 $modsFolderPath = "$scriptDirectory\mods"  # Mods folder location
 $tempExtractPath = "$scriptDirectory\minecraft_temp_extract"  # Temporary folder for Mods Only option
 
-# Display menu and get user input
-Write-Host "Select an option:"
-Write-Host ""
-Write-Host "1. (*Recommended) Full Update (Delete and replace the mods folder, extract all files)"
-Write-Host "2. Mods only (Delete and replace only the mods folder)"
-Write-Host ""
-$choice = Read-Host "Enter your choice (1 or 2)"
-
-# Process user input
-switch ($choice) {
-    "1" {
-        $option = "Full"
-    }
-    "2" {
-        $option = "Mods only"
-    }
-    default {
-        Write-Host "Invalid choice, exiting script."
-        exit
-    }
-}
+# No user input, defaulting to "Full" or "Mods Only" as required (adjust as needed)
+$option = "Mods only"  # Always replace mods, you can change this to "Full" if needed.
 
 # Function to download files using gdown with cookies.txt
 function Download-File {
@@ -131,7 +112,7 @@ if ($option -eq "Full") {
 
     # Extract to temporary folder
     Write-Host "Extracting .minecraft.zip to 'minecraft_temp_extract' folder..."
-    $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_FILE`" -o`"$tempExtractPath`""  # No overwrite needed for temp folder
+    $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_FILE`" -aoa -o`"$tempExtractPath`""  # '-aoa' forces overwrite
     Invoke-Expression $extractCommand
 
     if ($LASTEXITCODE -ne 0) {
@@ -147,6 +128,18 @@ if ($option -eq "Full") {
     } else {
         Write-Host "Mods folder not found in extracted files."
     }
+
+    # Clean up the temporary extraction folder
+    if (Test-Path $tempExtractPath) {
+        Write-Host "Cleaning up temporary extraction folder..."
+        Remove-Item -Recurse -Force $tempExtractPath
+    }
+}
+
+# Clean up the downloaded .minecraft.zip file if desired
+if (Test-Path $DOWNLOAD_FILE) {
+    Write-Host "Cleaning up downloaded .minecraft.zip file..."
+    Remove-Item -Force $DOWNLOAD_FILE
 }
 
 Write-Host "Update complete!!"
@@ -180,18 +173,6 @@ switch ($input) {
     }
     default {
         Write-Host "Exiting script..."
-        
-        # Clean up the temporary extraction folder
-        if (Test-Path $tempExtractPath) {
-            Write-Host "Cleaning up temporary extraction folder..."
-            Remove-Item -Recurse -Force $tempExtractPath
-        }
-
-        # Clean up the downloaded .minecraft.zip file if desired
-        if (Test-Path $DOWNLOAD_FILE) {
-            Write-Host "Cleaning up downloaded .minecraft.zip file..."
-            Remove-Item -Force $DOWNLOAD_FILE
-        }
     }
 }
 

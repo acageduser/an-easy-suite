@@ -29,7 +29,8 @@ if (-Not (Test-Path $TEMP_EXTRACT_PATH)) {
     New-Item -ItemType Directory -Force -Path $TEMP_EXTRACT_PATH | Out-Null
 }
 
-# Clear-Host
+Clear-Host
+
 # Display menu and get user input
 Write-Host "Select an option:"
 Write-Host ""
@@ -63,24 +64,42 @@ function Download-File {
         if (Test-Path $COOKIES_PATH) {
             $cookiesOption = "--cookies $COOKIES_PATH"
         }
-        & "python" -c "import gdown; gdown.download('$url', r'$output', quiet=False, fuzzy=True, use_cookies=True)"
+        if (Get-Command python -ErrorAction SilentlyContinue) {
+            & "python" -c "import gdown; gdown.download('$url', r'$output', quiet=False, fuzzy=True, use_cookies=True)"
+        } else {
+            Write-Host "Python not found! Please install Python and gdown."
+            exit 1
+        }
         $fileSize = (Get-Item $output).Length
         if ($fileSize -lt 1024) {
             throw "Downloaded file is too small to be valid. Please check the permissions and the link."
         }
     } catch {
-        Write-Host "Download failed. Exiting script."
+        Write-Host "Download failed: $_. Exiting script."
         exit 1
     }
 }
-# Clear-Host
 
 # Download the .minecraft zip from Google Drive if it doesn't already exist
 if (-Not (Test-Path $DOWNLOAD_FILE)) {
     Write-Host "Downloading .minecraft.zip from Google Drive..."
     Download-File -url $GDRIVE_URL -output $DOWNLOAD_FILE
 }
-# Clear-Host
+
+# 7-Zip path checking for flexibility
+$7zipPaths = @("C:\Program Files\7-Zip\7z.exe", "C:\Program Files (x86)\7-Zip\7z.exe")
+$7zipPath = $null
+foreach ($path in $7zipPaths) {
+    if (Test-Path $path) {
+        $7zipPath = $path
+        break
+    }
+}
+
+if (-Not $7zipPath) {
+    Write-Host "7-Zip not found. Please install it from https://7-zip.org or provide the correct path."
+    exit 1
+}
 
 # Full process: delete all folders and files
 if ($option -eq "Full") {
@@ -104,7 +123,6 @@ if ($option -eq "Full") {
         }
     }
 }
-# Clear-Host
 
 # Mods only: delete and move the mods folder only
 if ($option -eq "Mods only") {
@@ -116,11 +134,9 @@ if ($option -eq "Mods only") {
         Remove-Item -Recurse -Force $modsPath
     }
 }
-# Clear-Host
 
 # Extract the downloaded archive using 7-Zip to a temporary location
 Write-Host "Extracting .minecraft.zip..."
-$7zipPath = "C:\Program Files\7-Zip\7z.exe"
 $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_FILE`" -o`"$TEMP_EXTRACT_PATH`" -y"
 Invoke-Expression $extractCommand
 
@@ -128,7 +144,6 @@ if ($LASTEXITCODE -ne 0) {
     Write-Host "Extraction failed. Exiting script."
     exit 1
 }
-# Clear-Host
 
 # Debugging: Check extracted directories
 Write-Host "Verifying extracted directories..."
@@ -148,7 +163,11 @@ foreach ($folder in $foldersToMove) {
         if (Test-Path $dest) {
             Remove-Item -Recurse -Force $dest
         }
-        Move-Item -Path $sourceFolder -Destination $dest -Force
+        try {
+            Move-Item -Path $sourceFolder -Destination $dest -Force
+        } catch {
+            Write-Host "Error moving $folder: $_"
+        }
     } else {
         Write-Host "Warning: Source folder '$sourceFolder' not found. Skipping."
     }
@@ -169,13 +188,16 @@ if ($option -eq "Full") {
 
 # Clean up the downloaded archive file and temporary extract folder
 Write-Host "Cleaning up..."
-if (Test-Path $DOWNLOAD_FILE) {
-    Remove-Item $DOWNLOAD_FILE
+try {
+    if (Test-Path $DOWNLOAD_FILE) {
+        Remove-Item $DOWNLOAD_FILE
+    }
+    if (Test-Path $TEMP_EXTRACT_PATH) {
+        Remove-Item -Recurse -Force $TEMP_EXTRACT_PATH
+    }
+} catch {
+    Write-Host "Error during cleanup: $_"
 }
-if (Test-Path $TEMP_EXTRACT_PATH) {
-    Remove-Item -Recurse -Force $TEMP_EXTRACT_PATH
-}
-# Clear-Host
 
 Write-Host "Update complete!!"
 Write-Host ""
@@ -211,4 +233,5 @@ switch ($input) {
     }
 }
 
+# Restore the original execution policy
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy $originalExecutionPolicy -Force

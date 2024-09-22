@@ -89,6 +89,8 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
+Clear-Host
+
 Write-Host "Folders and files successfully overwritten."
 
 Write-Host "Update complete!!"

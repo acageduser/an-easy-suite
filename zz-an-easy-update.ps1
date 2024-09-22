@@ -21,12 +21,14 @@ $GDRIVE_URL = "https://drive.google.com/uc?export=download&id=19Y9HV7bJdSt2VyyVU
 $scriptDirectory = $PSScriptRoot  # Directory where the script is run
 $DOWNLOAD_FILE = "$scriptDirectory\.minecraft.zip"  # File to be downloaded and extracted in place
 $COOKIES_PATH = "$env:USERPROFILE\.cache\gdown\cookies.txt"
+$modsFolderPath = "$scriptDirectory\mods"  # Mods folder location
+$tempExtractPath = "$scriptDirectory\minecraft_temp_extract"  # Temporary folder for Mods Only option
 
 # Display menu and get user input
 Write-Host "Select an option:"
 Write-Host ""
-Write-Host "1. (*Recommended) Full Update (Copy and replace needed folders and files)"
-Write-Host "2. Mods only (Copy and replace only the mods folder)"
+Write-Host "1. (*Recommended) Full Update (Delete and replace the mods folder, extract all files)"
+Write-Host "2. Mods only (Delete and replace only the mods folder)"
 Write-Host ""
 $choice = Read-Host "Enter your choice (1 or 2)"
 
@@ -92,25 +94,62 @@ if (-Not $7zipPath) {
     exit 1
 }
 
-# Extract the downloaded archive using 7-Zip, overwrite files
-Write-Host "Extracting .minecraft.zip (overwrite mode)..."
-$extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_FILE`" -aoa -o`"$scriptDirectory`""
-Invoke-Expression $extractCommand
-
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "Extraction failed. Exiting script."
-    exit 1
-}
-
-# Depending on user choice, decide which folders to handle
+# Full Update: Delete mods folder and extract all files
 if ($option -eq "Full") {
-    $foldersToOverwrite = @("mods", "shaderpacks", "resourcepacks", "journeymap", "config")
-} elseif ($option -eq "Mods only") {
-    $foldersToOverwrite = @("mods")
-}
+    if (Test-Path $modsFolderPath) {
+        Write-Host "Deleting the mods folder..."
+        Remove-Item -Recurse -Force $modsFolderPath
+    } else {
+        Write-Host "Mods folder not found, skipping deletion."
+    }
 
-# No need to manually handle the files, they are already overwritten during extraction
-Write-Host "Folders and files successfully overwritten."
+    # Extract the downloaded archive using 7-Zip, overwrite files
+    Write-Host "Extracting .minecraft.zip (overwrite mode)..."
+    $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_FILE`" -aoa -o`"$scriptDirectory`""  # '-aoa' forces overwrite
+    Invoke-Expression $extractCommand
+
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Extraction failed. Exiting script."
+        exit 1
+    }
+
+    Write-Host "Folders and files successfully overwritten."
+
+# Mods Only: Delete mods folder, extract to temp, copy mods back
+} elseif ($option -eq "Mods only") {
+    if (Test-Path $modsFolderPath) {
+        Write-Host "Deleting the mods folder..."
+        Remove-Item -Recurse -Force $modsFolderPath
+    } else {
+        Write-Host "Mods folder not found, skipping deletion."
+    }
+
+    # Ensure the temporary extract path exists
+    if (-Not (Test-Path $tempExtractPath)) {
+        New-Item -ItemType Directory -Force -Path $tempExtractPath | Out-Null
+    }
+
+    # Extract to temporary folder
+    Write-Host "Extracting .minecraft.zip to 'minecraft_temp_extract' folder..."
+    $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_FILE`" -o`"$tempExtractPath`""
+    Invoke-Expression $extractCommand
+
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Extraction to temp folder failed. Exiting script."
+        exit 1
+    }
+
+    # Copy only the mods folder contents to the main directory
+    $sourceModsFolder = "$tempExtractPath\mods"
+    if (Test-Path $sourceModsFolder) {
+        Write-Host "Copying mods folder to the main directory..."
+        Copy-Item -Recurse -Force -Path $sourceModsFolder -Destination $scriptDirectory
+    } else {
+        Write-Host "Mods folder not found in extracted files."
+    }
+
+    # Optionally, cleanup temp folder (if needed in the future)
+}
 
 Write-Host "Update complete!!"
 Write-Host ""

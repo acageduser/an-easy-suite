@@ -19,8 +19,8 @@ $GDRIVE_URL = "https://drive.google.com/uc?export=download&id=19Y9HV7bJdSt2VyyVU
 
 # Paths
 $scriptDirectory = $PSScriptRoot  # Directory where the script is run
-$MINECRAFT_FOLDER = "$scriptDirectory\minecraft_temp_extract"
-$TEMP_EXTRACT_PATH = "$scriptDirectory\minecraft_temp_extract"
+$MINECRAFT_FOLDER = "$scriptDirectory\.minecraft"
+$TEMP_EXTRACT_PATH = "$scriptDirectory\minecraft_temp_extract"  # Ensure we use minecraft_temp_extract as the source
 $DOWNLOAD_FILE = "$scriptDirectory\.minecraft.zip"
 $COOKIES_PATH = "$env:USERPROFILE\.cache\gdown\cookies.txt"
 
@@ -129,7 +129,7 @@ if ($option -eq "Full") {
 }
 
 foreach ($folder in $foldersToCopy) {
-    # Correct destination path without extra ".minecraft"
+    # Destination path is based on the correct Minecraft folder
     $dest = Join-Path -Path $MINECRAFT_FOLDER -ChildPath $folder
     $sourceFolder = Join-Path -Path $TEMP_EXTRACT_PATH -ChildPath $folder
 

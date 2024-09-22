@@ -19,7 +19,7 @@ $GDRIVE_URL = "https://drive.google.com/uc?export=download&id=19Y9HV7bJdSt2VyyVU
 
 # Paths
 $scriptDirectory = $PSScriptRoot  # Directory where the script is run
-$MINECRAFT_FOLDER = "$scriptDirectory\.minecraft"
+$MINECRAFT_FOLDER = "$scriptDirectory\minecraft_temp_extract"
 $TEMP_EXTRACT_PATH = "$scriptDirectory\minecraft_temp_extract"
 $DOWNLOAD_FILE = "$scriptDirectory\.minecraft.zip"
 $COOKIES_PATH = "$env:USERPROFILE\.cache\gdown\cookies.txt"

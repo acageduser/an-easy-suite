@@ -129,35 +129,39 @@ if ($option -eq "Full") {
 }
 
 foreach ($folder in $foldersToCopy) {
-    # Corrected: Join the destination path without the extra ".minecraft"
+    # Correct destination path without extra ".minecraft"
     $dest = Join-Path -Path $MINECRAFT_FOLDER -ChildPath $folder
     $sourceFolder = Join-Path -Path $TEMP_EXTRACT_PATH -ChildPath $folder
+
     if (Test-Path $sourceFolder) {
+        # Create the destination folder if it doesn't exist
         if (-not (Test-Path $dest)) {
+            Write-Host "Creating folder structure for $folder..."
             New-Item -Path $dest -ItemType Directory -Force
         }
+
+        # Copy all files and subdirectories from source to destination
         try {
-            Write-Host "Copying $folder..."
-            Copy-Item -Path "$sourceFolder\*" -Destination $dest -Recurse -Force  # Ensure copy works for contents
+            Write-Host "Copying contents of $folder..."
+            Get-ChildItem -Path $sourceFolder -Recurse | ForEach-Object {
+                # Build destination path
+                $destPath = $_.FullName -replace [regex]::Escape($TEMP_EXTRACT_PATH), $MINECRAFT_FOLDER
+
+                # If it's a directory, ensure it exists in the destination
+                if ($_.PSIsContainer) {
+                    if (-not (Test-Path $destPath)) {
+                        New-Item -Path $destPath -ItemType Directory -Force
+                    }
+                } else {
+                    # If it's a file, copy it to the destination
+                    Copy-Item -Path $_.FullName -Destination $destPath -Force
+                }
+            }
         } catch {
-            Write-Host "Error copying ${folder}: $_"
+            Write-Host "Error copying contents of ${folder}: $_"
         }
     } else {
         Write-Host "Warning: Source folder '$sourceFolder' not found. Skipping."
-    }
-}
-
-# Copy specific files to the .minecraft folder (Full option only)
-if ($option -eq "Full") {
-    $filesToCopy = @("options.txt", "optionsof.txt", "optionsshaders.txt", "servers.dat", "servers.dat_old")
-    foreach ($file in $filesToCopy) {
-        $sourceFile = Join-Path -Path $TEMP_EXTRACT_PATH -ChildPath $file
-        if (Test-Path $sourceFile) {
-            Write-Host "Copying $file..."
-            Copy-Item -Path $sourceFile -Destination $MINECRAFT_FOLDER -Force
-        } else {
-            Write-Host "Warning: Source file '$sourceFile' not found. Skipping."
-        }
     }
 }
 

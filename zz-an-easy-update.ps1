@@ -166,7 +166,7 @@ foreach ($folder in $foldersToMove) {
         try {
             Move-Item -Path $sourceFolder -Destination $dest -Force
         } catch {
-            Write-Host "Error moving $folder: $_"
+            Write-Host "Error moving ${folder}: $_"
         }
     } else {
         Write-Host "Warning: Source folder '$sourceFolder' not found. Skipping."

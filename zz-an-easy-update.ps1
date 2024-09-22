@@ -1,5 +1,5 @@
 # zz-an-easy-update.ps1
-# Clear-Host
+Clear-Host
 
 Write-Host "Before running this script:"
 Write-Host "    a.  Close Minecraft."
@@ -28,8 +28,6 @@ $COOKIES_PATH = "$env:USERPROFILE\.cache\gdown\cookies.txt"
 if (-Not (Test-Path $TEMP_EXTRACT_PATH)) {
     New-Item -ItemType Directory -Force -Path $TEMP_EXTRACT_PATH | Out-Null
 }
-
-Clear-Host
 
 # Display menu and get user input
 Write-Host "Select an option:"
@@ -143,6 +141,18 @@ Invoke-Expression $extractCommand
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Extraction failed. Exiting script."
     exit 1
+}
+
+# Checking for nested directories after extraction
+Write-Host "Checking for nested directories..."
+$nestedFolder = Get-ChildItem -Path $TEMP_EXTRACT_PATH | Where-Object { $_.PSIsContainer } | Select-Object -First 1
+
+# If a nested folder exists, adjust the $TEMP_EXTRACT_PATH to point inside it
+if ($nestedFolder -and (Test-Path "$TEMP_EXTRACT_PATH\$($nestedFolder.Name)\mods")) {
+    Write-Host "Nested directory found: $($nestedFolder.Name)"
+    $TEMP_EXTRACT_PATH = "$TEMP_EXTRACT_PATH\$($nestedFolder.Name)"
+} else {
+    Write-Host "No nested directory found."
 }
 
 # Debugging: Check extracted directories

@@ -22,12 +22,9 @@ $scriptDirectory = $PSScriptRoot  # Directory where the script is run
 $DOWNLOAD_FILE = "$scriptDirectory\.minecraft.zip"  # File to be downloaded and extracted in place
 $COOKIES_PATH = "$env:USERPROFILE\.cache\gdown\cookies.txt"
 $modsFolderPath = "$scriptDirectory\mods"  # Mods folder location
-$tempExtractPath = "$scriptDirectory\minecraft_temp_extract"  # Temporary folder for Mods Only option
 
-# No user input, defaulting to "Full" or "Mods Only" as required (adjust as needed)
-$option = "Mods only"  # Always replace mods, you can change this to "Full" if needed.
-
-# Function to download files using gdown with cookies.txt
+# Download the Minecraft Archive
+Write-Host "Downloading .minecraft.zip from Google Drive..."
 function Download-File {
     param (
         [string]$url,
@@ -56,7 +53,6 @@ function Download-File {
 
 # Download the .minecraft zip from Google Drive if it doesn't already exist
 if (-Not (Test-Path $DOWNLOAD_FILE)) {
-    Write-Host "Downloading .minecraft.zip from Google Drive..."
     Download-File -url $GDRIVE_URL -output $DOWNLOAD_FILE
 }
 
@@ -76,71 +72,24 @@ if (-Not $7zipPath) {
 }
 
 # Full Update: Delete mods folder and extract all files
-if ($option -eq "Full") {
-    if (Test-Path $modsFolderPath) {
-        Write-Host "Deleting the mods folder..."
-        Remove-Item -Recurse -Force $modsFolderPath
-    } else {
-        Write-Host "Mods folder not found, skipping deletion."
-    }
-
-    # Extract the downloaded archive using 7-Zip, overwrite files
-    Write-Host "Extracting .minecraft.zip (overwrite mode)..."
-    $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_FILE`" -aoa -o`"$scriptDirectory`""  # '-aoa' forces overwrite
-    Invoke-Expression $extractCommand
-
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host "Extraction failed. Exiting script."
-        exit 1
-    }
-
-    Write-Host "Folders and files successfully overwritten."
-
-# Mods Only: Delete mods folder, extract to temp, copy mods back
-} elseif ($option -eq "Mods only") {
-    if (Test-Path $modsFolderPath) {
-        Write-Host "Deleting the mods folder..."
-        Remove-Item -Recurse -Force $modsFolderPath
-    } else {
-        Write-Host "Mods folder not found, skipping deletion."
-    }
-
-    # Ensure the temporary extract path exists
-    if (-Not (Test-Path $tempExtractPath)) {
-        New-Item -ItemType Directory -Force -Path $tempExtractPath | Out-Null
-    }
-
-    # Extract to temporary folder
-    Write-Host "Extracting .minecraft.zip to 'minecraft_temp_extract' folder..."
-    $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_FILE`" -aoa -o`"$tempExtractPath`""  # '-aoa' forces overwrite
-    Invoke-Expression $extractCommand
-
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host "Extraction to temp folder failed. Exiting script."
-        exit 1
-    }
-
-    # Copy only the mods folder contents to the main directory
-    $sourceModsFolder = "$tempExtractPath\mods"
-    if (Test-Path $sourceModsFolder) {
-        Write-Host "Copying mods folder to the main directory..."
-        Copy-Item -Recurse -Force -Path $sourceModsFolder -Destination $scriptDirectory
-    } else {
-        Write-Host "Mods folder not found in extracted files."
-    }
-
-    # Clean up the temporary extraction folder
-    if (Test-Path $tempExtractPath) {
-        Write-Host "Cleaning up temporary extraction folder..."
-        Remove-Item -Recurse -Force $tempExtractPath
-    }
+if (Test-Path $modsFolderPath) {
+    Write-Host "Deleting the mods folder..."
+    Remove-Item -Recurse -Force $modsFolderPath
+} else {
+    Write-Host "Mods folder not found, skipping deletion."
 }
 
-# Clean up the downloaded .minecraft.zip file if desired
-if (Test-Path $DOWNLOAD_FILE) {
-    Write-Host "Cleaning up downloaded .minecraft.zip file..."
-    Remove-Item -Force $DOWNLOAD_FILE
+# Extract the downloaded archive using 7-Zip, overwrite files
+Write-Host "Extracting .minecraft.zip (overwrite mode)..."
+$extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_FILE`" -aoa -o`"$scriptDirectory`""  # '-aoa' forces overwrite
+Invoke-Expression $extractCommand
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Extraction failed. Exiting script."
+    exit 1
 }
+
+Write-Host "Folders and files successfully overwritten."
 
 Write-Host "Update complete!!"
 Write-Host ""
@@ -158,6 +107,7 @@ Write-Host "|     (   ',  .'\ ;'|"
 Write-Host " \     | .'     '-'/"
 Write-Host "  '.   ;/        .'"
 Write-Host "    ''-._____."
+
 Write-Host ""
 Write-Host "Menu:"
 Write-Host " 1. Download Minecraft Forge 1.20.1 installer"
@@ -173,6 +123,12 @@ switch ($input) {
     }
     default {
         Write-Host "Exiting script..."
+        
+        # Clean up the downloaded .minecraft.zip file
+        if (Test-Path $DOWNLOAD_FILE) {
+            Write-Host "Cleaning up downloaded .minecraft.zip file..."
+            Remove-Item -Force $DOWNLOAD_FILE
+        }
     }
 }
 

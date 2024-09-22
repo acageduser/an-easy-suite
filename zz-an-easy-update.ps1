@@ -197,13 +197,12 @@ if ($option -eq "Full") {
 }
 
 # Clean up the downloaded archive file and temporary extract folder
+# Clean up the temporary extract folder only, keeping the .minecraft.zip file
 Write-Host "Cleaning up..."
 try {
-    if (Test-Path $DOWNLOAD_FILE) {
-        Remove-Item $DOWNLOAD_FILE
-    }
+    # Keeping the .minecraft.zip file, so no deletion here
     if (Test-Path $TEMP_EXTRACT_PATH) {
-        Remove-Item -Recurse -Force $TEMP_EXTRACT_PATH
+        Remove-Item -Recurse -Force $TEMP_EXTRACT_PATH  # Clean up temp extract folder
     }
 } catch {
     Write-Host "Error during cleanup: $_"

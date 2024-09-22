@@ -131,7 +131,7 @@ if ($option -eq "Full") {
 
     # Extract to temporary folder
     Write-Host "Extracting .minecraft.zip to 'minecraft_temp_extract' folder..."
-    $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_FILE`" -o`"$tempExtractPath`""
+    $extractCommand = "& `"$7zipPath`" x `"$DOWNLOAD_FILE`" -o`"$tempExtractPath`""  # No overwrite needed for temp folder
     Invoke-Expression $extractCommand
 
     if ($LASTEXITCODE -ne 0) {
@@ -148,7 +148,17 @@ if ($option -eq "Full") {
         Write-Host "Mods folder not found in extracted files."
     }
 
-    # Optionally, cleanup temp folder (if needed in the future)
+    # Clean up the temporary extraction folder
+    if (Test-Path $tempExtractPath) {
+        Write-Host "Cleaning up temporary extraction folder..."
+        Remove-Item -Recurse -Force $tempExtractPath
+    }
+}
+
+# Clean up the downloaded .minecraft.zip file if desired
+if (Test-Path $DOWNLOAD_FILE) {
+    Write-Host "Cleaning up downloaded .minecraft.zip file..."
+    Remove-Item -Force $DOWNLOAD_FILE
 }
 
 Write-Host "Update complete!!"

@@ -2,8 +2,8 @@
 # Clear-Host
 
 Write-Host "Before running this script:"
-Write-Host "    1.  Close Minecraft."
-Write-Host "    2.  Verify that the following are installed on your PC:"
+Write-Host "    a.  Close Minecraft."
+Write-Host "    b.  Verify that the following are installed on your PC:"
 Write-Host "         - Python (python.org/downloads)"
 Write-Host "         - PIP (curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py)"
 Write-Host "         - 7-zip (7-zip.org)"
